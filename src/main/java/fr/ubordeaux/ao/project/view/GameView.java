@@ -1,5 +1,12 @@
 package fr.ubordeaux.ao.project.view;
 
-public class GameView {
-    //affichage avec mazing
+import fr.ubordeaux.ao.mazing.api.WindowGame;
+
+public class GameView extends WindowGame {
+
+    public GameView() {
+        setTitle("Ennemie");
+        setFPS(65);
+        setVisible(true);
+    }
 }
