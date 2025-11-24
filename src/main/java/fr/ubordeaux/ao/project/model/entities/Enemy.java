@@ -4,23 +4,47 @@ import fr.ubordeaux.ao.project.model.graph.Position;
 import fr.ubordeaux.ao.project.model.entities.Player;
 import fr.ubordeaux.ao.project.model.graph.MazeGraph;
 
-/**
- * Fichier "Bouchon" (Stub) pour la Personne 2.
- * Représente un ennemi.
- */
 public class Enemy extends Entity {
 
-    public Enemy(Position pos) {
+    public enum Size { SMALL, MEDIUM, LARGE }
+
+    private Size size;
+    private float speed;
+
+    public Enemy(Position pos, Size size) {
         super(pos);
+        this.size = size;
+
+        switch (size) {
+            case SMALL  -> speed = 0.15f;
+            case MEDIUM -> speed = 0.10f;
+            case LARGE  -> speed = 0.05f;
+        }
     }
-
-    // --- Méthodes appelées par Game.java ---
-
     public boolean isAlive() {
-        return true; // L'ennemi est toujours vivant (pour l'instant)
+        return true;
     }
+
+    /**
+     * Mise à jour de l'ennemi.
+     * Pour l'instant : déplacement horizontal simple comme dans Ennemie.
+     */
 
     public void update(Player player, MazeGraph mazeGraph) {
-        // L'IA (P2) n'est pas encore implémentée
+        Position pos = getPosition();
+
+        // Déplacement horizontal comme dans votre ancienne classe Ennemie
+        float x = pos.getX() - speed;
+        float y = pos.getY();
+
+        // Mettre à jour les coordonnées directement
+        pos.setX(x);
+        pos.setY(y);
+
+        // Vous pourrez ensuite utiliser mazeGraph + player pour une IA avancée.
     }
+
+    // Getters
+    public Size getSize() { return size; }
+    public float getSpeed() { return speed; }
 }

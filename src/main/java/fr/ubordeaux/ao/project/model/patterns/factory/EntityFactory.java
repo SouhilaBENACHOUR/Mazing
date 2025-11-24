@@ -30,8 +30,13 @@ public class EntityFactory {
         switch (type) {
             case PLAYER:
                 return new Player(pos); // P1 a besoin de ça
-            case ENEMY:
-                return new Enemy(pos); // P1 a besoin de ça
+            case ENEMY_SMALL:
+                return new Enemy(pos, Enemy.Size.SMALL);
+            case ENEMY_MEDIUM:
+                return new Enemy(pos, Enemy.Size.MEDIUM);
+            case ENEMY_LARGE:
+                return new Enemy(pos, Enemy.Size.LARGE);
+
             case WALL:
                 return new Wall(pos); // P1 a besoin de ça (pour isWalkable)
 

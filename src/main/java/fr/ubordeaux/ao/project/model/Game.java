@@ -190,7 +190,7 @@ public class Game {
 
         // 2. Créer les ennemis
         for (Position spawn : maze.getEnemySpawns()) {
-            Entity e = EntityFactory.createEntity(EntityType.ENEMY, spawn);
+            Entity e = EntityFactory.createEntity(EntityType.ENEMY_MEDIUM, spawn);
             if (e != null) { // <-- SÉCURITÉ
                 this.enemies.add((Enemy) e);
             }
