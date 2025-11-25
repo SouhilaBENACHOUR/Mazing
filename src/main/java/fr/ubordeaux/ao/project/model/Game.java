@@ -190,11 +190,23 @@ public class Game {
 
         // 2. Créer les ennemis
         for (Position spawn : maze.getEnemySpawns()) {
-            Entity e = EntityFactory.createEntity(EntityType.ENEMY_MEDIUM, spawn);
+            // Choisir aléatoirement le type d'araignée
+            EntityType type;
+            double r = Math.random(); // nombre entre 0 et 1
+            if (r < 0.33) {
+                type = EntityType.ENEMY_SMALL;
+            } else if (r < 0.66) {
+                type = EntityType.ENEMY_MEDIUM;
+            } else {
+                type = EntityType.ENEMY_LARGE;
+            }
+
+            Entity e = EntityFactory.createEntity(type, spawn);
             if (e != null) { // <-- SÉCURITÉ
                 this.enemies.add((Enemy) e);
             }
         }
+
 
         // 3. Créer la clé (s'il y en a une)
         if (maze.getKeyPosition() != null) {

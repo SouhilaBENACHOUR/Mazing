@@ -3,6 +3,7 @@ package fr.ubordeaux.ao.project.view;
 import fr.ubordeaux.ao.project.model.Game;
 import fr.ubordeaux.ao.project.model.GameConfig;
 import fr.ubordeaux.ao.project.model.Maze;
+import fr.ubordeaux.ao.project.model.entities.Enemy;
 import fr.ubordeaux.ao.project.model.entities.Player;
 import fr.ubordeaux.ao.project.model.patterns.observer.GameObserver;
 import fr.ubordeaux.ao.project.controller.KeyboardController;
@@ -11,6 +12,8 @@ import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.IWindowGame;
 
 import javax.swing.JFrame;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Vue du jeu avec Mazing.
@@ -21,6 +24,7 @@ public class GameView implements GameObserver {
     private IWindowGame windowGame;
     private HudRenderer hudRenderer;
     private Crusader crusaderSprite;
+    private Map<Enemy, EnemyView> enemyViews = new HashMap<>();
 
     // Pas besoin du drapeau 'isMazeDrawn'
 
@@ -31,6 +35,7 @@ public class GameView implements GameObserver {
         this.windowGame.add(crusaderSprite);
 
         this.hudRenderer = new HudRenderer(windowGame);
+
     }
 
     /**
@@ -46,11 +51,10 @@ public class GameView implements GameObserver {
         // --- FIN MODIFICATION ---
 
         drawPlayer(game.getPlayer());
+        drawEnemies(game);
         hudRenderer.draw(game);
 
-        // (P3 devra ajouter le dessin des ennemis/items ici)
-        // drawEnemies(game.getEnemies());
-        // drawItems(game.getItems());
+
     }
 
     /**
@@ -86,6 +90,32 @@ public class GameView implements GameObserver {
             crusaderSprite.setMode(Crusader.Mode.IDLE);
         }
     }
+
+    private void drawEnemies(Game game) {
+        // --- Crée les EnemyView manquants ---
+        for (Enemy enemy : game.getEnemies()) {
+            if (!enemyViews.containsKey(enemy)) {
+                EnemyView view = new EnemyView(enemy);
+                enemyViews.put(enemy, view);
+                windowGame.add(view);
+            }
+        }
+
+        // --- Met à jour la position de tous les EnemyView existants
+        for (Enemy enemy : game.getEnemies()) {
+            EnemyView view = enemyViews.get(enemy);
+            if (view != null) {
+                float x = enemy.getPosition().getX();
+                float y = enemy.getPosition().getY();
+                float z = 0; // au niveau du sol
+                view.setPosition(x, y, z);
+            }
+        }
+
+        //  Supprime les EnemyView pour les ennemis qui ont disparu
+        enemyViews.keySet().removeIf(e -> !game.getEnemies().contains(e));
+    }
+
 
     /**
      * Dessine le labyrinthe statique (murs et sol).
