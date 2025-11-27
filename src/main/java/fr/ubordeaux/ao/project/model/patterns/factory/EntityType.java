@@ -10,7 +10,9 @@ public enum EntityType {
     // Définissez ici les associations entre le type et le caractère
     // (J'ai repris les caractères de votre exemple de fichier de niveau)
     PLAYER('P'),
-    ENEMY('E'),
+    ENEMY_SMALL('S'),
+    ENEMY_MEDIUM('M'),
+    ENEMY_LARGE('L'),
     KEY('K'),
     WALL('W'),
     DOOR('D'),
