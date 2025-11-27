@@ -13,6 +13,7 @@ import fr.ubordeaux.ao.mazing.api.IWindowGame;
 
 import javax.swing.JFrame;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,8 +27,6 @@ public class GameView implements GameObserver {
     private Crusader crusaderSprite;
     private Map<Enemy, EnemyView> enemyViews = new HashMap<>();
 
-    // Pas besoin du drapeau 'isMazeDrawn'
-
     public GameView(IWindowGame windowGame) {
         this.windowGame = windowGame;
 
@@ -35,52 +34,38 @@ public class GameView implements GameObserver {
         this.windowGame.add(crusaderSprite);
 
         this.hudRenderer = new HudRenderer(windowGame);
-
     }
 
     /**
-     * C'est la méthode de l'interface GameObserver (PLAYER-9).
+     * Méthode de l'interface GameObserver.
      * Appelée à chaque "tick" par la GameLoop.
      */
     @Override
     public void onGameUpdate(Game game) {
-
-        // --- MODIFICATION ---
-        // onGameUpdate ne met à jour QUE les éléments dynamiques.
-        // Le labyrinthe statique n'est plus dessiné ici.
-        // --- FIN MODIFICATION ---
-
         drawPlayer(game.getPlayer());
-        drawEnemies(game);
+        drawEnemies(game.getEnemies());
         hudRenderer.draw(game);
-
-
     }
 
     /**
-     * Méthode pour attacher le KeyListener au JFrame.
+     * Attache le KeyListener au JFrame.
      */
     public void addKeyListener(KeyboardController controller) {
         ((JFrame) this.windowGame).addKeyListener(controller);
     }
 
     /**
-     * Met à jour la position du joueur (PLAYER-3).
+     * Met à jour la position et l'animation du joueur.
      */
     private void drawPlayer(Player player) {
         if (player == null || crusaderSprite == null) return;
 
-        // --- MODIFICATION ---
-        // Le joueur est à Z=0, au même niveau que le sol.
         float x = (float) player.getPosition().getX();
         float y = (float) player.getPosition().getY();
         float z = 0.0f; // Au niveau du sol
-        // --- FIN MODIFICATION ---
 
         crusaderSprite.setPosition(x, y, z);
-
-        String apiDirection = player.getDirection().toString();
-        crusaderSprite.setDirection(apiDirection);
+        crusaderSprite.setDirection(player.getDirection().toString());
 
         if (!player.isAlive()) {
             crusaderSprite.setMode(Crusader.Mode.DEATH);
@@ -91,9 +76,14 @@ public class GameView implements GameObserver {
         }
     }
 
-    private void drawEnemies(Game game) {
-        // --- Crée les EnemyView manquants ---
-        for (Enemy enemy : game.getEnemies()) {
+    /**
+     * Met à jour les EnemyView pour tous les ennemis.
+     */
+    private void drawEnemies(List<Enemy> enemies) {
+        if (enemies == null) return;
+
+        // Crée les EnemyView manquants
+        for (Enemy enemy : enemies) {
             if (!enemyViews.containsKey(enemy)) {
                 EnemyView view = new EnemyView(enemy);
                 enemyViews.put(enemy, view);
@@ -101,8 +91,8 @@ public class GameView implements GameObserver {
             }
         }
 
-        // --- Met à jour la position de tous les EnemyView existants
-        for (Enemy enemy : game.getEnemies()) {
+        // Met à jour la position de tous les EnemyView existants
+        for (Enemy enemy : enemies) {
             EnemyView view = enemyViews.get(enemy);
             if (view != null) {
                 float x = enemy.getPosition().getX();
@@ -112,15 +102,12 @@ public class GameView implements GameObserver {
             }
         }
 
-        //  Supprime les EnemyView pour les ennemis qui ont disparu
-        enemyViews.keySet().removeIf(e -> !game.getEnemies().contains(e));
+        // Supprime les EnemyView pour les ennemis disparus
+        enemyViews.keySet().removeIf(e -> !enemies.contains(e));
     }
-
 
     /**
      * Dessine le labyrinthe statique (murs et sol).
-     * (Logique fournie par P3)
-     * --- MODIFICATION : Cette méthode est maintenant 'public' ---
      */
     public void drawMaze(Maze maze) {
         if (maze == null) {
@@ -139,15 +126,13 @@ public class GameView implements GameObserver {
                     code = GameConfig.FLOOR_CODE;
                 }
 
-                // Ajoute le sprite de décor à la scène
                 windowGame.add(code, x, y, 0); // z=0 (le sol)
             }
         }
     }
 
     /**
-     * Calcule le code de sprite de mur correct pour l'auto-tiling.
-     * (Logique fournie par P3)
+     * Calcule le code de sprite de mur pour l'auto-tiling.
      */
     private int getWallCode(int x, int y, Maze maze) {
         boolean wallLeft = (x > 0) && maze.getTile(x - 1, y) == GameConfig.LEVEL_WALL;
@@ -164,7 +149,7 @@ public class GameView implements GameObserver {
         if (wallDown) vertical++;
 
         int codeHorizontal = 129;
-        int codeVertical = 131; // GameConfig.WALL_CODE
+        int codeVertical = 131;
 
         if (horizontal > vertical) {
             return codeHorizontal;
@@ -176,7 +161,7 @@ public class GameView implements GameObserver {
             } else if (x == 0 || x == maze.getWidth() - 1) {
                 return codeVertical;
             } else {
-                return codeHorizontal; // Par défaut
+                return codeHorizontal;
             }
         }
     }

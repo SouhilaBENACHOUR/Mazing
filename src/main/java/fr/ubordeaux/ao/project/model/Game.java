@@ -192,7 +192,7 @@ public class Game {
         for (Position spawn : maze.getEnemySpawns()) {
             // Choisir aléatoirement le type d'araignée
             EntityType type;
-            double r = Math.random(); // nombre entre 0 et 1
+            double r = Math.random();
             if (r < 0.33) {
                 type = EntityType.ENEMY_SMALL;
             } else if (r < 0.66) {
@@ -202,7 +202,7 @@ public class Game {
             }
 
             Entity e = EntityFactory.createEntity(type, spawn);
-            if (e != null) { // <-- SÉCURITÉ
+            if (e != null) {
                 this.enemies.add((Enemy) e);
             }
         }
