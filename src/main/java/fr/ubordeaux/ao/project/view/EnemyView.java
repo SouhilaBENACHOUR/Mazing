@@ -12,9 +12,9 @@ public class EnemyView extends Spider {
         this.model = model;
 
         switch (model.getSize()) {
-            case SMALL  -> { setScale(1.5f); setFrameRate(Mode.WALK, 1.37f); }
-            case MEDIUM -> { setScale(2.5f); setFrameRate(Mode.WALK, 1.47f); }
-            case LARGE  -> { setScale(3.5f); setFrameRate(Mode.WALK, 1.57f); }
+            case SMALL  -> { setScale(3.5f); setFrameRate(Mode.WALK, 1.57f); }
+            case MEDIUM -> { setScale(4.0f); setFrameRate(Mode.WALK, 1.67f); }
+            case LARGE  -> { setScale(4.5f); setFrameRate(Mode.WALK, 1.77f); }
         }
 
         setMode(Mode.WALK);

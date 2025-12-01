@@ -62,7 +62,7 @@ public class GameView implements GameObserver {
 
         float x = (float) player.getPosition().getX();
         float y = (float) player.getPosition().getY();
-        float z = 0.0f; // Au niveau du sol
+        float z = 0.1f + (enemyViews.size() * 0.001f);
 
         crusaderSprite.setPosition(x, y, z);
         crusaderSprite.setDirection(player.getDirection().toString());
@@ -92,17 +92,20 @@ public class GameView implements GameObserver {
         }
 
         // Met à jour la position de tous les EnemyView existants
+        int index = 0;
         for (Enemy enemy : enemies) {
             EnemyView view = enemyViews.get(enemy);
             if (view != null) {
                 float x = enemy.getPosition().getX();
                 float y = enemy.getPosition().getY();
-                float z = 0; // au niveau du sol
+                float z = 0.1f + index * 0.001f; // couche différente
+
                 view.setPosition(x, y, z);
             }
+            index++;
         }
 
-        // Supprime les EnemyView pour les ennemis disparus
+        // Nettoie les vues inutiles
         enemyViews.keySet().removeIf(e -> !enemies.contains(e));
     }
 
