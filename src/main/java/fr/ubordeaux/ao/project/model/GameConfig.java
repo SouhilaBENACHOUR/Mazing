@@ -1,12 +1,12 @@
 package fr.ubordeaux.ao.project.model;
 
 public class GameConfig {
-/**
- * Configuration globale du jeu.
- *
- * Cette classe contient toutes les constantes utilisées dans le projet.
- * Aucune valeur ne doit être codée en dur dans le code.
- */
+    /**
+     * Configuration globale du jeu.
+     *
+     * Cette classe contient toutes les constantes utilisées dans le projet.
+     * Aucune valeur ne doit être codée en dur dans le code.
+     */
 
     // ========================================
     // CONSTANTES DE FENÊTRE
@@ -14,14 +14,14 @@ public class GameConfig {
 
     //Largeur de la fenêtre de jeu en pixels.
 
-    public static final int WINDOW_WIDTH = 1024;
+    public static final int WINDOW_WIDTH = 1000;
 
     //Hauteur de la fenêtre de jeu en pixels.
 
-    public static final int WINDOW_HEIGHT = 768;
+    public static final int WINDOW_HEIGHT = 1200;
 
     // Nombre d'images par seconde.
-     //Le jeu tourne à 30 FPS.
+    //Le jeu tourne à 30 FPS.
 
     public static final int FPS = 30;
 
@@ -38,7 +38,7 @@ public class GameConfig {
 
     //Taille d'une tuile du labyrinthe en pixels.
 
-    public static final int TILE_SIZE = 100;
+    public static final int TILE_SIZE = 64;
 
     /**
      * Largeur par défaut du labyrinthe en nombre de cases.
@@ -69,8 +69,34 @@ public class GameConfig {
      * Code Mazing pour la sortie (exit).
      * Valeur temporaire.
      */
-    public static final int EXIT_CODE = 200;
+    public static final int EXIT_CODE = 300;
 
+// ========================================
+// CODES MAZING - OBJETS
+// ========================================
+
+    /**
+     * Code Mazing pour le coffre (représente la clé).
+     */
+    public static final int KEY_CODE = 551;
+
+
+
+    // ========================================
+// CODES MAZING - PORTES
+// ========================================
+
+    /**
+     * Codes Mazing pour les portes fermées.
+     */
+    public static final int DOOR_CLOSED_HORIZONTAL = 161;  // Porte horizontale fermée
+    public static final int DOOR_CLOSED_VERTICAL = 163;    // Porte verticale fermée
+
+    /**
+     * Codes Mazing pour les portes ouvertes.
+     */
+    public static final int DOOR_OPEN_HORIZONTAL = 165;    // Porte horizontale ouverte
+    public static final int DOOR_OPEN_VERTICAL = 166;      // Porte verticale ouverte
 
     // ========================================
     // CONSTANTES DE GAMEPLAY

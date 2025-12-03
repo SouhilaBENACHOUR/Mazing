@@ -15,7 +15,7 @@ public class TestMaze {
         System.out.println("Spawn joueur: " + maze.getPlayerSpawn());
         System.out.println("Nb ennemis: " + maze.getEnemySpawns().size());
         System.out.println("Clé: " + maze.getKeyPosition());
-        System.out.println("Porte: " + maze.getDoorPosition());
+        System.out.println("Porte: " + maze.getDoorPositions());
         System.out.println("Sortie: " + maze.getExitPosition());
 
         System.out.println("\nGrille:");

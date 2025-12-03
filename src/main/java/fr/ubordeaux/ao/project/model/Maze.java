@@ -3,6 +3,8 @@ package fr.ubordeaux.ao.project.model;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import fr.ubordeaux.ao.project.model.graph.Position;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -18,15 +20,18 @@ public class Maze {
     private int height;
     private char[][] tiles;
     private String name;
+    private int windowWidth;
+    private int windowHeight;
 
     private Position playerSpawn;
     private List<Position> enemySpawns;
     private Position keyPosition;
-    private Position doorPosition;
+    private List<Position> doorPositions;  // ← PLUSIEURS PORTES
     private Position exitPosition;
 
     public Maze(String fileName) {
         this.enemySpawns = new ArrayList<>();
+        this.doorPositions = new ArrayList<>();  // ← INITIALISATION
         loadJson(fileName);
     }
 
@@ -42,19 +47,26 @@ public class Maze {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 
-            // Parser le JSON avec Gson
             Gson gson = new Gson();
             JsonObject json = gson.fromJson(reader, JsonObject.class);
 
-            // Récupérer les infos de base
             this.name = json.get("name").getAsString();
             this.width = json.get("width").getAsInt();
             this.height = json.get("height").getAsInt();
 
-            // Créer la grille
+            if (json.has("windowWidth")) {
+                this.windowWidth = json.get("windowWidth").getAsInt();
+            } else {
+                this.windowWidth = GameConfig.WINDOW_WIDTH; // Valeur par défaut
+            }
+
+            if (json.has("windowHeight")) {
+                this.windowHeight = json.get("windowHeight").getAsInt();
+            } else {
+                this.windowHeight = GameConfig.WINDOW_HEIGHT; // Valeur par défaut
+            }
             tiles = new char[height][width];
 
-            // Lire les lignes de tuiles
             JsonArray tilesArray = json.getAsJsonArray("tiles");
 
             for (int y = 0; y < height; y++) {
@@ -64,7 +76,6 @@ public class Maze {
                 for (int x = 0; x < width; x++) {
                     char c = parts[x].charAt(0);
 
-                    // Gérer les cases spéciales
                     if (c == 'P') {
                         playerSpawn = new Position(x, y);
                         tiles[y][x] = '0';
@@ -75,7 +86,7 @@ public class Maze {
                         keyPosition = new Position(x, y);
                         tiles[y][x] = '0';
                     } else if (c == 'D') {
-                        doorPosition = new Position(x, y);
+                        doorPositions.add(new Position(x, y));
                         tiles[y][x] = 'D';
                     } else if (c == 'X') {
                         exitPosition = new Position(x, y);
@@ -98,7 +109,7 @@ public class Maze {
         if (x < 0 || x >= width || y < 0 || y >= height) {
             return false;
         }
-        return tiles[y][x] != '1';
+        return tiles[y][x] == GameConfig.LEVEL_FLOOR;
     }
 
     public char getTile(int x, int y) {
@@ -125,6 +136,8 @@ public class Maze {
     public Position getPlayerSpawn() { return playerSpawn; }
     public List<Position> getEnemySpawns() { return enemySpawns; }
     public Position getKeyPosition() { return keyPosition; }
-    public Position getDoorPosition() { return doorPosition; }
+    public List<Position> getDoorPositions() { return doorPositions; }  // ← GETTER
     public Position getExitPosition() { return exitPosition; }
+    public int getWindowWidth() { return windowWidth; }
+    public int getWindowHeight() { return windowHeight; }
 }
