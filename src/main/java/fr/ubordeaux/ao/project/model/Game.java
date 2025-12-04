@@ -70,8 +70,9 @@ public class Game {
      * (Responsabilité P1)
      */
     public void loadLevel(String levelFileName) {
-        resetGame();
-        setLoading(true);
+        setLoading(true);  // Bloquer updateGame()
+
+        // Nettoyer pour le nouveau niveau (mais garder vies et score)
         this.player = null;
         this.enemies.clear();
         this.items.clear();
@@ -79,24 +80,17 @@ public class Game {
         this.isGameOver = false;
 
         try {
-            // 1. Charger le labyrinthe (qui charge le JSON)
             this.maze = new Maze(levelFileName);
-
-            // 2. Construire le graphe basé sur le labyrinthe chargé (P1)
             mazeGraph.buildGraph(this.maze);
-
-            // 3. Placer les entités en utilisant les infos du labyrinthe (P1)
             populateEntitiesFromMaze();
-
             System.out.println("Niveau '" + maze.getName() + "' chargé.");
-
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("ERREUR lors du chargement du niveau : " + levelFileName);
             this.isGameOver = true;
         }
 
-        setLoading(false);
+        setLoading(false);  // Débloquer updateGame()
         notifyObservers();
     }
 
@@ -105,34 +99,39 @@ public class Game {
      * (Responsabilité P1)
      */
     public void updateGame() {
-        if (isGameOver || isLevelComplete) return; // Jeu en pause
+        // Protection renforcée
+        if (isGameOver || isLevelComplete || isLoading) {
+            return;
+        }
 
-        // 1. Mettre à jour le joueur (délègue à P2)
+        if (player == null || maze == null) {
+            return;
+        }
+
+        // 1. Mettre à jour le joueur
         if (player != null) {
             player.update();
         }
 
-        // 2. Mettre à jour les ennemis (délègue à P2)
+        // 2. Mettre à jour les ennemis
         Iterator<Enemy> enemyIterator = enemies.iterator();
         while (enemyIterator.hasNext()) {
             Enemy enemy = enemyIterator.next();
             if (enemy.isAlive()) {
-                // L'IA (P2) utilise le graphe (P1)
                 enemy.update(player, mazeGraph);
             } else {
-                score += 100; // Logique de mort (P1)
+                score += 100;
                 enemyIterator.remove();
             }
         }
 
-        // 3. Vérifier la logique du jeu (P1)
+        // 3. Vérifier la logique du jeu
         checkCollisions();
         checkGameStatus();
 
-        // 4. Notifier la Vue (P1)
+        // 4. Notifier la Vue
         notifyObservers();
     }
-
     /**
      * Gère la demande de mouvement du joueur (appelée par KeyboardController - P3).
      * (Logique P1)
@@ -289,23 +288,25 @@ public class Game {
      * Gère la Victoire/Défaite (Logique P1).
      */
     private void checkGameStatus() {
+        // Protection contre null
+        if (player == null || maze == null || maze.getExitPosition() == null) {
+            return;
+        }
+
         // 1. Défaite
         if (lives <= 0 && !isGameOver) {
             isGameOver = true;
             System.out.println("GAME OVER");
         }
 
-        // 2. Victoire
-        // Vérifie si le joueur est sur la case Sortie
-        if (player.getPosition().equals(maze.getExitPosition())) {
-            // (P2 doit gérer la logique de "la sortie est-elle ouverte ?")
-            // Pour l'instant, on gagne si on touche la sortie
+        // 2. Victoire - Utiliser distance au lieu de equals()
+        float distance = (float) player.getPosition().distanceTo(maze.getExitPosition());
+        if (distance < 0.9f) {
             isLevelComplete = true;
             score += 1000;
             System.out.println("NIVEAU TERMINE !");
         }
     }
-
     /**
      * Réinitialise l'état du jeu (Logique P1).
      */
