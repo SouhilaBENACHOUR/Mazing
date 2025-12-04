@@ -2,6 +2,8 @@ package fr.ubordeaux.ao.project.test;
 
 import fr.ubordeaux.ao.project.model.Maze;
 import fr.ubordeaux.ao.project.view.GameView;
+import fr.ubordeaux.ao.mazing.api.IWindowGame;
+import fr.ubordeaux.ao.mazing.api.WindowGame;
 
 /**
  * Test de l'affichage du labyrinthe avec Mazing.
@@ -17,8 +19,8 @@ public class TestGameView {
             System.out.println("Labyrinthe chargé : " + maze.getWidth() + "x" + maze.getHeight());
 
             // Créer la vue
-            GameView view = new GameView(maze);
-            System.out.println("Fenêtre créée et labyrinthe affiché !");
+            IWindowGame windowGame = new WindowGame(); // 1. Créez la fenêtre
+            GameView view = new GameView(windowGame);            System.out.println("Fenêtre créée et labyrinthe affiché !");
 
             System.out.println("\nFenêtre ouverte. Regardez l'écran !");
             System.out.println("Fermez la fenêtre pour terminer le programme.");

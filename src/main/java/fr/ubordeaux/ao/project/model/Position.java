@@ -1,5 +1,8 @@
 package fr.ubordeaux.ao.project.model;
 
+import fr.ubordeaux.ao.mazing.api.Direction;
+
+// Classe Position simple pour stocker X,Y
 /**
  * Position dans le jeu (x, y, z).
  * Version temporaire.
@@ -22,17 +25,29 @@ public class Position {
         this.z = 0;
     }
 
-    public float getX() {
-        return x;
-    }
+    public void setX(int x){ this.x = x; }
+    public void setY(int y){ this.y = y; }
 
-    public float getY() {
-        return y;
+    // renvoie une nouvelle position selon la direction
+    public Position next(Direction d){
+        int nx = x, ny = y;
+        switch(d){
+            case NORTH -> ny -= 1;
+            case SOUTH -> ny += 1;
+            case EAST  -> nx += 1;
+            case WEST  -> nx -= 1;
+            case NORTHEAST -> { nx += 1; ny -= 1; }
+            case NORTHWEST -> { nx -= 1; ny -= 1; }
+            case SOUTHEAST -> { nx += 1; ny += 1; }
+            case SOUTHWEST -> { nx -= 1; ny += 1; }
+        }
+        return new Position(nx, ny);
     }
 
     public float getZ() {
         return z;
     }
+}
 
     @Override
     public String toString() {

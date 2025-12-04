@@ -3,6 +3,8 @@ package fr.ubordeaux.ao.project.model;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import fr.ubordeaux.ao.project.model.graph.Position;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -96,9 +98,15 @@ public class Maze {
 
     public boolean isWalkable(int x, int y) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
-            return false;
+            return false; // Hors limites
         }
-        return tiles[y][x] != '1';
+
+        // --- MODIFICATION ICI ---
+        // On ne vérifie plus ce qui bloque, on vérifie ce qui est permis.
+        // Seul le sol ('0' ou LEVEL_FLOOR) est praticable.
+        // Tout le reste (Murs '1', Portes 'D', etc.) bloque le passage.
+        return tiles[y][x] == GameConfig.LEVEL_FLOOR;
+        // --- FIN MODIFICATION ---
     }
 
     public char getTile(int x, int y) {

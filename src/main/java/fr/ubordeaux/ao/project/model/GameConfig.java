@@ -1,12 +1,12 @@
 package fr.ubordeaux.ao.project.model;
 
 public class GameConfig {
-/**
- * Configuration globale du jeu.
- *
- * Cette classe contient toutes les constantes utilisées dans le projet.
- * Aucune valeur ne doit être codée en dur dans le code.
- */
+    /**
+     * Configuration globale du jeu.
+     *
+     * Cette classe contient toutes les constantes utilisées dans le projet.
+     * Aucune valeur ne doit être codée en dur dans le code.
+     */
 
     // ========================================
     // CONSTANTES DE FENÊTRE
@@ -21,7 +21,7 @@ public class GameConfig {
     public static final int WINDOW_HEIGHT = 768;
 
     // Nombre d'images par seconde.
-     //Le jeu tourne à 30 FPS.
+    //Le jeu tourne à 30 FPS.
 
     public static final int FPS = 30;
 
