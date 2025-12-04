@@ -4,7 +4,9 @@ package fr.ubordeaux.ao.project.model.graph;
 
 import fr.ubordeaux.ao.project.model.Maze;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,4 +69,26 @@ public class MazeGraph {
     public Node getNode(Position pos) {
         return nodes.get(pos);
     }
+
+
+    /**
+     * Renvoie la liste des directions praticables depuis une position donnée.
+     * @param pos Position de départ
+     * @return Liste des directions où l'ennemi peut se déplacer
+     */
+    public List<Direction> getWalkableDirections(Position pos) {
+        List<Direction> walkable = new ArrayList<>();
+        Node node = nodes.get(pos);
+        if (node == null) return walkable;
+
+        for (Edge edge : node.getEdges()) {
+            Position neighborPos = edge.getTarget().getPosition();
+            Direction dir = pos.getDirectionTo(neighborPos);
+            if (dir != null) {
+                walkable.add(dir);
+            }
+        }
+        return walkable;
+    }
+
 }

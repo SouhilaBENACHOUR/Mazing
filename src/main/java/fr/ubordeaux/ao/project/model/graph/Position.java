@@ -37,6 +37,18 @@ public class Position {
         return z;
     }
 
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    public void setZ(float z) {
+        this.z = z;
+    }
+
     // --- METHOD 1 ADDED (Fixes 'Cannot resolve method 'getNeighbor'') ---
 
     /**
@@ -93,4 +105,27 @@ public class Position {
         // Hash code basé sur la position arrondie de la grille
         return Objects.hash(Math.round(x), Math.round(y));
     }
+
+    /**
+     * Calcule la direction de cette position vers une position voisine.
+     * @param neighborPos La position voisine
+     * @return La Direction correspondante, ou null si non voisine
+     */
+    public Direction getDirectionTo(Position neighborPos) {
+        if (neighborPos == null) return null;
+
+        int dx = Math.round(neighborPos.getX() - this.x);
+        int dy = Math.round(neighborPos.getY() - this.y);
+
+        // On compare avec les valeurs de dx/dy pour déterminer la direction
+        for (Direction dir : Direction.values()) {
+            if (dir.getDx() == dx && dir.getDy() == dy) {
+                return dir;
+            }
+        }
+
+        // Si aucun match, ce n'est pas un voisin direct
+        return null;
+    }
+
 }

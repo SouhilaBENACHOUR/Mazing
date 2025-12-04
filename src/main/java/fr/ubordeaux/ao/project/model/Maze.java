@@ -26,7 +26,7 @@ public class Maze {
     private Position playerSpawn;
     private List<Position> enemySpawns;
     private Position keyPosition;
-    private List<Position> doorPositions;  // ← PLUSIEURS PORTES
+    private Position doorPosition;
     private Position exitPosition;
 
     public Maze(String fileName) {
@@ -107,9 +107,15 @@ public class Maze {
 
     public boolean isWalkable(int x, int y) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
-            return false;
+            return false; // Hors limites
         }
+
+        // --- MODIFICATION ICI ---
+        // On ne vérifie plus ce qui bloque, on vérifie ce qui est permis.
+        // Seul le sol ('0' ou LEVEL_FLOOR) est praticable.
+        // Tout le reste (Murs '1', Portes 'D', etc.) bloque le passage.
         return tiles[y][x] == GameConfig.LEVEL_FLOOR;
+        // --- FIN MODIFICATION ---
     }
 
     public char getTile(int x, int y) {

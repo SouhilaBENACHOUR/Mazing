@@ -47,12 +47,17 @@ public class HudRenderer {
      * Appelé par GameView.onGameUpdate().
      */
     public void draw(Game game) {
+        // Mettre à jour le texte des vies
         livesLabel.setText("Vies: " + game.getLives());
 
+        // Afficher "GAME OVER" si le jeu est terminé
         if (game.isGameOver()) {
             gameOverLabel.setText("GAME OVER");
             gameOverLabel.setForeground(Color.RED);
             gameOverLabel.setVisible(true);
+        } else if (game.isLevelComplete()) {
+            gameOverLabel.setText("YOU WIN!");
+            gameOverLabel.setForeground(Color.GREEN);
         }
         else if (game.isFinalVictory()) {  // ← Seulement si victoire finale
             gameOverLabel.setText("🏆 YOU WIN! 🏆");
