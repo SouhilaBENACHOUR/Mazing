@@ -36,6 +36,7 @@ public class Game {
     private int lives;
     private boolean isGameOver;
     private boolean isLevelComplete;
+    private boolean isLoading;
 
     // --- Attributs pour Pattern Observer ---
     private List<GameObserver> observers;
@@ -58,6 +59,8 @@ public class Game {
         this.lives = GameConfig.PLAYER_LIVES;
         this.isGameOver = false;
         this.isLevelComplete = false;
+        this.isLoading = false;
+
     }
 
     // --- 1. MÉTHODES DE LOGIQUE PRINCIPALE ---
@@ -68,6 +71,12 @@ public class Game {
      */
     public void loadLevel(String levelFileName) {
         resetGame();
+        setLoading(true);
+        this.player = null;
+        this.enemies.clear();
+        this.items.clear();
+        this.isLevelComplete = false;
+        this.isGameOver = false;
 
         try {
             // 1. Charger le labyrinthe (qui charge le JSON)
@@ -87,6 +96,7 @@ public class Game {
             this.isGameOver = true;
         }
 
+        setLoading(false);
         notifyObservers();
     }
 
@@ -183,51 +193,54 @@ public class Game {
         // 1. Créer le joueur
         if (maze.getPlayerSpawn() != null) {
             Entity p = EntityFactory.createEntity(EntityType.PLAYER, maze.getPlayerSpawn());
-            if (p != null) { // <-- SÉCURITÉ
+            if (p != null) {
                 this.player = (Player) p;
             }
         }
 
         // 2. Créer les ennemis
+        // 2. Créer les ennemis
         for (Position spawn : maze.getEnemySpawns()) {
             // Choisir aléatoirement le type d'araignée
-            EntityType type;
-            double r = Math.random();
-            if (r < 0.33) {
-                type = EntityType.ENEMY_SMALL;
-            } else if (r < 0.66) {
-                type = EntityType.ENEMY_MEDIUM;
+            EntityType enemyType;
+            double random = Math.random();
+
+            if (random < 0.33) {
+                enemyType = EntityType.ENEMY_SMALL;
+            } else if (random < 0.66) {
+                enemyType = EntityType.ENEMY_MEDIUM;
             } else {
-                type = EntityType.ENEMY_LARGE;
+                enemyType = EntityType.ENEMY_LARGE;
             }
 
-            Entity e = EntityFactory.createEntity(type, spawn);
+            Entity e = EntityFactory.createEntity(enemyType, spawn);
             if (e != null) {
                 this.enemies.add((Enemy) e);
             }
         }
 
-
         // 3. Créer la clé (s'il y en a une)
         if (maze.getKeyPosition() != null) {
             Entity k = EntityFactory.createEntity(EntityType.KEY, maze.getKeyPosition());
-            if (k != null) { // <-- SÉCURITÉ (CORRECTION PRINCIPALE)
+            if (k != null) {
                 this.items.add(k);
             }
         }
 
-        // 4. Créer la porte (s'il y en a une)
-        if (maze.getDoorPosition() != null) {
-            Entity d = EntityFactory.createEntity(EntityType.DOOR, maze.getDoorPosition());
-            if (d != null) { // <-- SÉCURITÉ (CORRECTION PRINCIPALE)
-                this.items.add(d);
+        // 4. Créer TOUTES les portes
+        if (maze.getDoorPositions() != null) {
+            for (Position doorPos : maze.getDoorPositions()) {
+                Entity d = EntityFactory.createEntity(EntityType.DOOR, doorPos);
+                if (d != null) {
+                    this.items.add(d);
+                }
             }
         }
 
-        // 5. Créer la sortie (s'il y en a une)
+        // 5. Créer la sortie
         if (maze.getExitPosition() != null) {
             Entity x = EntityFactory.createEntity(EntityType.EXIT, maze.getExitPosition());
-            if (x != null) { // <-- SÉCURITÉ (CORRECTION PRINCIPALE)
+            if (x != null) {
                 this.items.add(x);
             }
         }
@@ -353,5 +366,21 @@ public class Game {
             }
         }
         return null;
+    }
+
+    /**
+     * Vérifie si le jeu est en train de charger un niveau.
+     * @return true si en chargement
+     */
+    public boolean isLoading() {
+        return isLoading;
+    }
+
+    /**
+     * Définit l'état de chargement.
+     * @param loading true si en chargement
+     */
+    public void setLoading(boolean loading) {
+        this.isLoading = loading;
     }
 }

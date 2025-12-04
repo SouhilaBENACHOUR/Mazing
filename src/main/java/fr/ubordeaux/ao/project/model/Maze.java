@@ -11,8 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Labyrinthe du jeu.
- * Charge depuis un fichier JSON.
+ * Représente le labyrinthe du jeu.
+ * Charge et gère la structure du niveau depuis un fichier JSON.
+ *
+ * @author Personne 3 (P3)
+ * @version 1.0
  */
 public class Maze {
 
@@ -20,21 +23,30 @@ public class Maze {
     private int height;
     private char[][] tiles;
     private String name;
-    private int windowWidth;
-    private int windowHeight;
 
     private Position playerSpawn;
     private List<Position> enemySpawns;
     private Position keyPosition;
-    private Position doorPosition;
+    private List<Position> doorPositions;  // ← CORRIGÉ : List<Position> au lieu de Position
     private Position exitPosition;
 
+    /**
+     * Constructeur du labyrinthe.
+     *
+     * @param fileName Le nom du fichier JSON à charger (ex: "level1.json")
+     */
     public Maze(String fileName) {
         this.enemySpawns = new ArrayList<>();
-        this.doorPositions = new ArrayList<>();  // ← INITIALISATION
+        this.doorPositions = new ArrayList<>();
         loadJson(fileName);
     }
 
+    /**
+     * Charge le labyrinthe depuis un fichier JSON.
+     * Parse les tuiles et identifie les positions spéciales (joueur, ennemis, objets).
+     *
+     * @param fileName Le nom du fichier JSON
+     */
     private void loadJson(String fileName) {
         String path = GameConfig.LEVELS_PATH + fileName;
         var stream = getClass().getClassLoader().getResourceAsStream(path);
@@ -54,17 +66,6 @@ public class Maze {
             this.width = json.get("width").getAsInt();
             this.height = json.get("height").getAsInt();
 
-            if (json.has("windowWidth")) {
-                this.windowWidth = json.get("windowWidth").getAsInt();
-            } else {
-                this.windowWidth = GameConfig.WINDOW_WIDTH; // Valeur par défaut
-            }
-
-            if (json.has("windowHeight")) {
-                this.windowHeight = json.get("windowHeight").getAsInt();
-            } else {
-                this.windowHeight = GameConfig.WINDOW_HEIGHT; // Valeur par défaut
-            }
             tiles = new char[height][width];
 
             JsonArray tilesArray = json.getAsJsonArray("tiles");
@@ -102,22 +103,31 @@ public class Maze {
 
         } catch (Exception e) {
             System.err.println("Erreur chargement JSON : " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
+    /**
+     * Vérifie si une case est praticable (le joueur peut marcher dessus).
+     *
+     * @param x Position X
+     * @param y Position Y
+     * @return true si la case est praticable, false sinon
+     */
     public boolean isWalkable(int x, int y) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
-            return false; // Hors limites
+            return false;
         }
-
-        // --- MODIFICATION ICI ---
-        // On ne vérifie plus ce qui bloque, on vérifie ce qui est permis.
-        // Seul le sol ('0' ou LEVEL_FLOOR) est praticable.
-        // Tout le reste (Murs '1', Portes 'D', etc.) bloque le passage.
         return tiles[y][x] == GameConfig.LEVEL_FLOOR;
-        // --- FIN MODIFICATION ---
     }
 
+    /**
+     * Retourne le caractère de la tuile à une position donnée.
+     *
+     * @param x Position X
+     * @param y Position Y
+     * @return Le caractère de la tuile ('0', '1', 'D', etc.)
+     */
     public char getTile(int x, int y) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
             return '1';
@@ -125,6 +135,9 @@ public class Maze {
         return tiles[y][x];
     }
 
+    /**
+     * Affiche le labyrinthe dans la console (debug).
+     */
     public void print() {
         System.out.println("=== " + name + " (" + width + "x" + height + ") ===");
         for (int y = 0; y < height; y++) {
@@ -136,14 +149,60 @@ public class Maze {
     }
 
     // Getters
-    public int getWidth() { return width; }
-    public int getHeight() { return height; }
-    public String getName() { return name; }
-    public Position getPlayerSpawn() { return playerSpawn; }
-    public List<Position> getEnemySpawns() { return enemySpawns; }
-    public Position getKeyPosition() { return keyPosition; }
-    public List<Position> getDoorPositions() { return doorPositions; }  // ← GETTER
-    public Position getExitPosition() { return exitPosition; }
-    public int getWindowWidth() { return windowWidth; }
-    public int getWindowHeight() { return windowHeight; }
+
+    /**
+     * @return La largeur du labyrinthe
+     */
+    public int getWidth() {
+        return width;
+    }
+
+    /**
+     * @return La hauteur du labyrinthe
+     */
+    public int getHeight() {
+        return height;
+    }
+
+    /**
+     * @return Le nom du niveau
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @return La position de spawn du joueur
+     */
+    public Position getPlayerSpawn() {
+        return playerSpawn;
+    }
+
+    /**
+     * @return La liste des positions de spawn des ennemis
+     */
+    public List<Position> getEnemySpawns() {
+        return enemySpawns;
+    }
+
+    /**
+     * @return La position de la clé
+     */
+    public Position getKeyPosition() {
+        return keyPosition;
+    }
+
+    /**
+     * @return La liste des positions des portes
+     */
+    public List<Position> getDoorPositions() {
+        return doorPositions;
+    }
+
+    /**
+     * @return La position de la sortie
+     */
+    public Position getExitPosition() {
+        return exitPosition;
+    }
 }

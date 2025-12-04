@@ -11,19 +11,12 @@ import fr.ubordeaux.ao.mazing.api.WindowGame;
 import javax.swing.*;
 import java.awt.Color;
 
-import fr.ubordeaux.ao.project.model.Game;
-import fr.ubordeaux.ao.project.model.GameConfig;
-import fr.ubordeaux.ao.project.view.GameView;
-import fr.ubordeaux.ao.project.controller.GameController;
-import fr.ubordeaux.ao.project.controller.KeyboardController;
-import fr.ubordeaux.ao.project.controller.GameLoop;
-import fr.ubordeaux.ao.mazing.api.IWindowGame;
-import fr.ubordeaux.ao.mazing.api.WindowGame;
-
-import javax.swing.*;
-
 /**
  * Classe principale pour lancer le jeu.
+ * Point d'entrée de l'application.
+ *
+ * @author Personne 3 (P3)
+ * @version 1.0
  */
 public class Main {
 
@@ -32,47 +25,69 @@ public class Main {
     private static GameView gameView;
     private static IWindowGame windowGame;
 
+    /**
+     * Point d'entrée principal du jeu.
+     * Initialise tous les composants MVC et démarre le jeu.
+     *
+     * @param args Arguments de ligne de commande (non utilisés)
+     */
     public static void main(String[] args) {
 
+        // 1. Créer la fenêtre Mazing
         windowGame = new WindowGame();
         windowGame.setTileSize(55);
         ((JFrame) windowGame).setSize(1400, 1200);
 
+        // 2. Créer les composants MVC
         gameModel = new Game();
         gameView = new GameView(windowGame);
         KeyboardController keyboardController = new KeyboardController(gameModel);
         GameLoop gameLoop = new GameLoop(gameModel, gameView);
         GameController gameController = new GameController(gameView, keyboardController);
 
+        // 3. Connecter le pattern Observer
         gameModel.addObserver(gameView);
 
+        // 4. Charger le premier niveau
         loadLevel(1);
 
+        // 5. Rendre la fenêtre visible
         windowGame.setVisible(true);
 
+        // 6. Dessiner le labyrinthe initial
         if (gameModel.getMaze() != null) {
             gameView.drawMaze(gameModel.getMaze());
             gameView.drawItems(gameModel.getMaze());
         }
 
+        // 7. Démarrer la boucle de jeu
         Thread gameThread = new Thread(gameLoop);
         gameThread.start();
 
+        // 8. Démarrer la surveillance de progression
         startLevelProgressionChecker();
 
         System.out.println("Jeu démarré. Bonne chance !");
     }
 
+    /**
+     * Charge un niveau spécifique depuis un fichier JSON.
+     * Ajuste la taille des tuiles selon le niveau.
+     *
+     * @param level Le numéro du niveau (1, 2 ou 3)
+     */
     private static void loadLevel(int level) {
         String levelFile = "level" + level + ".json";
 
         try {
             gameModel.loadLevel(levelFile);
 
+            // Attendre la fin du chargement
             while (gameModel.isLoading()) {
                 Thread.sleep(50);
             }
 
+            // Ajuster la taille des tuiles selon le niveau
             switch (level) {
                 case 1:
                     windowGame.setTileSize(55);
@@ -93,6 +108,10 @@ public class Main {
         }
     }
 
+    /**
+     * Thread qui surveille la progression des niveaux.
+     * Gère les transitions entre niveaux et la victoire finale.
+     */
     private static void startLevelProgressionChecker() {
         Thread progressionThread = new Thread(() -> {
 
@@ -100,32 +119,18 @@ public class Main {
                 try {
                     Thread.sleep(300);
 
-                    // DEBUG DÉTAILLÉ
                     boolean levelComplete = gameModel.isLevelComplete();
                     boolean loading = gameModel.isLoading();
 
-                    // Afficher l'état toutes les 3 secondes environ
-                    if (System.currentTimeMillis() % 3000 < 300) {
-                        System.out.println("DEBUG CHECK: currentLevel=" + currentLevel +
-                                ", isLevelComplete=" + levelComplete +
-                                ", isLoading=" + loading);
-                    }
-
                     if (levelComplete && !loading) {
-
-                        System.out.println("!!! NIVEAU COMPLET DÉTECTÉ !!!");
-                        System.out.println("DEBUG: currentLevel AVANT incrémentation = " + currentLevel);
 
                         gameModel.setLoading(true);
 
                         int completedLevel = currentLevel;
                         currentLevel++;
 
-                        System.out.println("DEBUG: currentLevel APRÈS incrémentation = " + currentLevel);
-                        System.out.println("DEBUG: Test condition: currentLevel <= 3 ? " + (currentLevel <= 3));
-
                         if (currentLevel <= 3) {
-                            System.out.println(">>> BRANCHE: Passage au niveau suivant <<<");
+                            // Passage au niveau suivant
                             System.out.println("\n🎉 Niveau " + completedLevel + " terminé !");
 
                             SwingUtilities.invokeLater(() -> {
@@ -150,7 +155,7 @@ public class Main {
                             gameModel.setLoading(false);
 
                         } else {
-                            System.out.println(">>> BRANCHE: VICTOIRE FINALE <<<");
+                            // Victoire finale
                             System.out.println("\n🏆 FÉLICITATIONS ! Vous avez terminé tous les niveaux ! 🏆\n");
 
                             SwingUtilities.invokeLater(() -> {
@@ -180,14 +185,15 @@ public class Main {
                     e.printStackTrace();
                 }
             }
-
-            System.out.println("Thread levelProgressionChecker terminé.");
         });
 
         progressionThread.setDaemon(true);
         progressionThread.start();
     }
 
+    /**
+     * Affiche la fenêtre de victoire finale avec le score.
+     */
     private static void showFinalVictoryScreen() {
         SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(
@@ -197,47 +203,5 @@ public class Main {
                     JOptionPane.INFORMATION_MESSAGE
             );
         });
-    }
-}
-
-    public static void main(String[] args) {
-
-        // --- 1. Initialisation des Composants ---
-        IWindowGame windowGame = new WindowGame();
-        ((JFrame) windowGame).setSize(GameConfig.WINDOW_WIDTH, GameConfig.WINDOW_HEIGHT);
-
-        Game gameModel = new Game();
-        GameView gameView = new GameView(windowGame);
-        KeyboardController keyboardController = new KeyboardController(gameModel);
-        GameLoop gameLoop = new GameLoop(gameModel, gameView);
-        GameController gameController = new GameController(gameView, keyboardController);
-
-        // --- 2. Connexion des Composants (Pattern Observer) ---
-        gameModel.addObserver(gameView);
-
-
-        // --- 3. Démarrage du Jeu ---
-        try {
-            // Étape A: Charger la logique du jeu
-            gameModel.loadLevel(GameConfig.LEVEL1_FILE);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("ERREUR : Impossible de charger le niveau initial.");
-            return;
-        }
-
-        // Étape B: Rendre la fenêtre visible
-        windowGame.setVisible(true);
-
-        // --- MODIFICATION ICI ---
-        // Étape C: Dessiner le décor statique (MAINTENANT que la fenêtre est visible)
-        gameView.drawMaze(gameModel.getMaze());
-        // --- FIN MODIFICATION ---
-
-        // Étape D: Démarrer la boucle de jeu
-        Thread gameThread = new Thread(gameLoop);
-        gameThread.start();
-
-        System.out.println("Jeu démarré. Bonne chance !");
     }
 }

@@ -40,7 +40,6 @@ public class Enemy extends Entity {
 
     public boolean isAlive() {
         return true;
-        return true; // L'ennemi est toujours vivant (pour l'instant)
     }
 
     // --- BFS pour trouver le chemin le plus court ---
