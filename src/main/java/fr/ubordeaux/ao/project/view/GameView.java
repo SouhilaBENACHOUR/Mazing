@@ -1,8 +1,10 @@
 package fr.ubordeaux.ao.project.view;
 
+import fr.ubordeaux.ao.mazing.api.Spider;
 import fr.ubordeaux.ao.project.model.Game;
 import fr.ubordeaux.ao.project.model.GameConfig;
 import fr.ubordeaux.ao.project.model.Maze;
+import fr.ubordeaux.ao.project.model.entities.Enemy;
 import fr.ubordeaux.ao.project.model.entities.Player;
 import fr.ubordeaux.ao.project.model.graph.Position;
 import fr.ubordeaux.ao.project.model.patterns.observer.GameObserver;
@@ -12,6 +14,9 @@ import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.IWindowGame;
 
 import javax.swing.JFrame;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Vue du jeu avec Mazing (partie View du MVC).
@@ -25,6 +30,7 @@ public class GameView implements GameObserver {
     private IWindowGame windowGame;
     private HudRenderer hudRenderer;
     private Crusader crusaderSprite;
+    private Map<Enemy, EnemyView> enemyViews = new HashMap<>();
 
     /**
      * Constructeur de la vue.
@@ -49,6 +55,7 @@ public class GameView implements GameObserver {
     @Override
     public void onGameUpdate(Game game) {
         drawPlayer(game.getPlayer());
+        drawEnemies(game.getEnemies());
         hudRenderer.draw(game);
     }
 
@@ -83,6 +90,69 @@ public class GameView implements GameObserver {
         } else {
             crusaderSprite.setMode(Crusader.Mode.IDLE);
         }
+    }
+    /**
+     * Met à jour la position et l'animation du spider.
+     *
+     * @param enemies Le spider à dessiner
+     */
+
+    private void drawEnemies(List<Enemy> enemies) {
+        if (enemies == null) return;
+
+        // 1) Ajouter les EnemyView manquants
+        for (Enemy enemy : enemies) {
+            if (!enemyViews.containsKey(enemy)) {
+                EnemyView view = new EnemyView(enemy);
+                enemyViews.put(enemy, view);
+                // EnemyView extends Spider -> on peut l'ajouter directement
+                windowGame.add(view);
+            }
+        }
+
+        // 2) Mettre à jour les positions et l'animation
+        for (Enemy enemy : enemies) {
+            EnemyView view = enemyViews.get(enemy);
+            if (view != null) {
+                float x = enemy.getPosition().getX();
+                float y = enemy.getPosition().getY();
+                view.setPosition(x, y, 0);
+
+                // Ici on ne tente pas de récupérer enemy.getDirection() (n'existe pas).
+                // Si l'ennemi est mort, jouer l'animation DEATH sinon WALK.
+                try {
+                    if (!enemy.isAlive()) {
+                        view.setMode(Spider.Mode.DEATH);
+                    } else {
+                        view.setMode(Spider.Mode.WALK);
+                    }
+                } catch (NoClassDefFoundError | Exception ignore) {
+                    // Défensive : si Spider.Mode n'est pas disponible pour une raison X,
+                    // on ignore l'exception pour éviter de casser le rendu.
+                }
+            }
+        }
+
+        // 3) Retirer (côté map) les EnemyView dont l'Enemy a disparu.
+        //    On ne fait PAS windowGame.remove(...) (API non disponible).
+        //    On place simplement le sprite hors écran pour le "cacher".
+        //    Puis on supprime l'entrée de la map.
+        enemyViews.entrySet().removeIf(entry -> {
+            Enemy key = entry.getKey();
+            if (!enemies.contains(key)) {
+                EnemyView removedView = entry.getValue();
+                // cacher le sprite hors de la zone de jeu
+                removedView.setPosition(-10f, -10f, 0f);
+                // optionnel : jouer l'animation de mort
+                try {
+                    removedView.setMode(Spider.Mode.DEATH);
+                } catch (Throwable t) {
+
+                }
+                return true;
+            }
+            return false;
+        });
     }
 
     /**

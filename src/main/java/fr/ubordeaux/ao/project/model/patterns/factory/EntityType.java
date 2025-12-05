@@ -49,9 +49,9 @@ public enum EntityType {
         // Boucle sur toutes les valeurs de l'énumération
         for (EntityType type : EntityType.values()) {
             if (type.getChar() == c) {
-                return type; // Trouvé !
+                return type;
             }
         }
-        return null; // Pas de type associé à ce caractère
+        return null;
     }
 }

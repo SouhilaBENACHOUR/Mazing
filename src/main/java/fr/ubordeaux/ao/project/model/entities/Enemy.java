@@ -1,5 +1,6 @@
 package fr.ubordeaux.ao.project.model.entities;
 
+import fr.ubordeaux.ao.project.model.Maze;
 import fr.ubordeaux.ao.project.model.graph.Position;
 import fr.ubordeaux.ao.project.model.entities.Player;
 import fr.ubordeaux.ao.project.model.graph.MazeGraph;
@@ -7,22 +8,20 @@ import fr.ubordeaux.ao.project.model.graph.Direction;
 
 import java.util.*;
 
-/**
- * Ennemi qui poursuit le joueur grâce à un pathfinding BFS.
- * BFS (Breadth-First Search) permet de trouver le chemin le plus court
- * dans un labyrinthe constitué de cases et de murs.
- * L'ennemi n'avance que lorsque le joueur est en mouvement.
- */
 public class Enemy extends Entity {
+
+
+    public void setPosition(Position pos) {
+        this.position = pos;
+    }
 
     public enum Size { SMALL, MEDIUM, LARGE }
 
     private Size size;
     private float speed = 0.45f;
-    private boolean canMove; // vrai uniquement si le joueur a commencé à bouger
-    private long lastMoveTime = 0;      // Dernier moment où l'ennemi a bougé
-    private long moveCooldown;          // Durée minimale entre deux déplacements
-
+    private boolean canMove;
+    private long lastMoveTime = 0;
+    private long moveCooldown;
 
     public Enemy(Position pos, Size size) {
         super(pos);
@@ -37,12 +36,10 @@ public class Enemy extends Entity {
         this.canMove = false;
     }
 
-
     public boolean isAlive() {
         return true;
     }
 
-    // --- BFS pour trouver le chemin le plus court ---
     private List<Position> findPath(Position start, Position goal, MazeGraph maze) {
         Map<Position, Position> parent = new HashMap<>();
         Queue<Position> queue = new LinkedList<>();
@@ -75,37 +72,41 @@ public class Enemy extends Entity {
         return path;
     }
 
+    public void update(Player player, MazeGraph mazeGraph, Maze maze) {
 
-    public void update(Player player, MazeGraph mazeGraph) {
+        // Activer l'ennemi uniquement quand le joueur bouge une première fois
         if (!canMove && player.isMoving()) {
             canMove = true;
         }
-
         if (!canMove) return;
 
         long now = System.currentTimeMillis();
-
-        //  Si le cooldown n'est pas écoulé l'araigné ne bouge pas
         if (now - lastMoveTime < moveCooldown) return;
-
-        // On bouge
         lastMoveTime = now;
 
         Position pos = getPosition();
         Position playerPos = player.getPosition();
 
+        // PATHFINDING BFS
         List<Position> path = findPath(pos, playerPos, mazeGraph);
+
+        // Pas de chemin → on ne bouge pas
         if (path.size() < 2) return;
 
+        // Case suivante
         Position next = path.get(1);
 
-        // Déplacement progressif selon speed
-        pos.setX(next.getX());
-        pos.setY(next.getY());
-        // L'IA (P2) n'est pas encore implémentée
+        // SECURITÉ ABSOLUE : l’Ennemi ne bouge QUE si walkable
+        int nx = (int) next.getX();
+        int ny = (int) next.getY();
+
+        if (!maze.isWalkable(nx, ny))
+            return;
+
+        // Déplacement accepté
+        setPosition(new Position(nx, ny));
     }
 
-    // --- Getters ---
     public Size getSize() { return size; }
     public float getSpeed() { return speed; }
 }
