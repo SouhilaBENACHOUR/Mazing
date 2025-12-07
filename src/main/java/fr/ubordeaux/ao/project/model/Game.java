@@ -157,7 +157,7 @@ public class Game {
             }
 
 
-            for (int i = 0; i <= maxEnemies;) {
+            for (int i = 0; i < maxEnemies; i++) {
                 Position spawnPos = spawns.get(random.nextInt(spawns.size()));
                 Position pos = findFreePositionNear(spawnPos, occupiedPositions);
 
