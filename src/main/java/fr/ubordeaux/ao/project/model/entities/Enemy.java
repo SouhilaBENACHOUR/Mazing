@@ -2,7 +2,6 @@ package fr.ubordeaux.ao.project.model.entities;
 
 import fr.ubordeaux.ao.project.model.Maze;
 import fr.ubordeaux.ao.project.model.graph.Position;
-import fr.ubordeaux.ao.project.model.entities.Player;
 import fr.ubordeaux.ao.project.model.graph.MazeGraph;
 import fr.ubordeaux.ao.project.model.graph.Direction;
 
@@ -10,18 +9,18 @@ import java.util.*;
 
 public class Enemy extends Entity {
 
-
-    public void setPosition(Position pos) {
-        this.position = pos;
-    }
-
     public enum Size { SMALL, MEDIUM, LARGE }
 
     private Size size;
-    private float speed = 0.45f;
+    private float speed;
     private boolean canMove;
+    private boolean alive = true;
     private long lastMoveTime = 0;
     private long moveCooldown;
+
+    // Pour optimiser le pathfinding
+    private List<Position> currentPath = new ArrayList<>();
+    private Position lastTargetPosition = null;
 
     public Enemy(Position pos, Size size) {
         super(pos);
@@ -37,7 +36,15 @@ public class Enemy extends Entity {
     }
 
     public boolean isAlive() {
-        return true;
+        return alive;
+    }
+
+    public void kill() {
+        this.alive = false;
+    }
+
+    public void setPosition(Position pos) {
+        this.position = pos;
     }
 
     private List<Position> findPath(Position start, Position goal, MazeGraph maze) {
@@ -73,8 +80,9 @@ public class Enemy extends Entity {
     }
 
     public void update(Player player, MazeGraph mazeGraph, Maze maze) {
+        if (!alive) return;
 
-        // Activer l'ennemi uniquement quand le joueur bouge une première fois
+        // Activer l'ennemi uniquement quand le joueur bouge
         if (!canMove && player.isMoving()) {
             canMove = true;
         }
@@ -87,24 +95,25 @@ public class Enemy extends Entity {
         Position pos = getPosition();
         Position playerPos = player.getPosition();
 
-        // PATHFINDING BFS
-        List<Position> path = findPath(pos, playerPos, mazeGraph);
+        // Recalculer le chemin si nécessaire
+        if (!playerPos.equals(lastTargetPosition) || currentPath.isEmpty()) {
+            currentPath = findPath(pos, playerPos, mazeGraph);
+            lastTargetPosition = playerPos;
+        }
 
-        // Pas de chemin → on ne bouge pas
-        if (path.size() < 2) return;
+        if (currentPath.size() < 2) return;
 
-        // Case suivante
-        Position next = path.get(1);
-
-        // SECURITÉ ABSOLUE : l’Ennemi ne bouge QUE si walkable
+        Position next = currentPath.get(1);
         int nx = (int) next.getX();
         int ny = (int) next.getY();
 
-        if (!maze.isWalkable(nx, ny))
+        if (!maze.isWalkable(nx, ny)) {
+            currentPath.clear();
             return;
+        }
 
-        // Déplacement accepté
         setPosition(new Position(nx, ny));
+        currentPath.remove(0);
     }
 
     public Size getSize() { return size; }

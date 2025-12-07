@@ -4,7 +4,9 @@ import fr.ubordeaux.ao.mazing.api.Spider;
 import fr.ubordeaux.ao.project.model.Game;
 import fr.ubordeaux.ao.project.model.GameConfig;
 import fr.ubordeaux.ao.project.model.Maze;
+import fr.ubordeaux.ao.project.model.entities.Door;
 import fr.ubordeaux.ao.project.model.entities.Enemy;
+import fr.ubordeaux.ao.project.model.entities.Entity;
 import fr.ubordeaux.ao.project.model.entities.Player;
 import fr.ubordeaux.ao.project.model.graph.Position;
 import fr.ubordeaux.ao.project.model.patterns.observer.GameObserver;
@@ -54,11 +56,26 @@ public class GameView implements GameObserver {
      */
     @Override
     public void onGameUpdate(Game game) {
-        drawPlayer(game.getPlayer());
-        drawEnemies(game.getEnemies());
+        // Si le niveau est terminé ou en chargement, cacher les ennemis
+        if (game.isLevelComplete() || game.isLoading()) {
+            hideAllEnemies();
+        } else {
+            drawPlayer(game.getPlayer());
+            drawEnemies(game.getEnemies());
+        }
+
+        updateDoors(game);
         hudRenderer.draw(game);
     }
 
+    /**
+     * Cache tous les sprites d'ennemis en les plaçant hors écran
+     */
+    private void hideAllEnemies() {
+        for (EnemyView view : enemyViews.values()) {
+            view.setPosition(-10000, -10000, 0);
+        }
+    }
     /**
      * Attache le contrôleur clavier à la fenêtre.
      *
@@ -96,39 +113,33 @@ public class GameView implements GameObserver {
      *
      * @param enemies Le spider à dessiner
      */
-    private void drawEnemies(List<Enemy> enemies) {
+
+    public void drawEnemies(List<Enemy> enemies) {
         if (enemies == null) return;
 
-        // Ajouter ou mettre à jour les EnemyView
+        Map<Enemy, EnemyView> updatedViews = new HashMap<>();
+
         for (Enemy enemy : enemies) {
+            if (!enemy.isAlive()) continue;
+
             EnemyView view = enemyViews.get(enemy);
             if (view == null) {
                 view = new EnemyView(enemy);
-                enemyViews.put(enemy, view);
                 windowGame.add(view);
+                System.out.println("Nouveau sprite créé pour ennemi");
             }
 
             float x = enemy.getPosition().getX();
             float y = enemy.getPosition().getY();
             view.setPosition(x, y, 0);
+            view.setMode(Spider.Mode.WALK);
 
-            try {
-                view.setMode(enemy.isAlive() ? Spider.Mode.WALK : Spider.Mode.DEATH);
-            } catch (Throwable ignore) {}
+            updatedViews.put(enemy, view);
         }
 
-        // Retirer les ennemis disparus
-        enemyViews.entrySet().removeIf(entry -> {
-            if (!enemies.contains(entry.getKey())) {
-                EnemyView view = entry.getValue();
-                view.setPosition(-10f, -10f, 0);
-                try { view.setMode(Spider.Mode.DEATH); } catch (Throwable ignore) {}
-                return true;
-            }
-            return false;
-        });
+        // Remplacer l'ancienne map par la nouvelle
+        enemyViews = updatedViews;
     }
-
     /**
      * Dessine le labyrinthe statique (murs et sol).
      * Appelé une seule fois au chargement du niveau.
@@ -234,6 +245,20 @@ public class GameView implements GameObserver {
         }
     }
 
+    private void updateDoors(Game game) {
+        Maze maze = game.getMaze();
+
+        for (Entity item : game.getItems()) {
+            if (item instanceof Door door) {
+                int x = (int) door.getPosition().getX();
+                int y = (int) door.getPosition().getY();
+                int code = getDoorCode(x, y, maze, door.isOpen());
+                windowGame.add(code, x, y, 0);
+            }
+        }
+    }
+
+
     /**
      * Calcule le code de mur selon l'orientation pour l'auto-tiling.
      *
@@ -290,5 +315,17 @@ public class GameView implements GameObserver {
      */
     public HudRenderer getHudRenderer() {
         return hudRenderer;
+    }
+    /**
+     * Nettoie tous les sprites d'ennemis.
+     * À appeler avant de charger un nouveau niveau.
+     */
+    public void clearEnemies() {
+        // Cacher tous les sprites avant de vider la map
+        for (EnemyView view : enemyViews.values()) {
+            view.setPosition(-10000, -10000, 0);
+        }
+        enemyViews.clear();
+        System.out.println("Map des sprites d'ennemis vidée");
     }
 }

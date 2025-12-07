@@ -132,59 +132,59 @@ public class Game {
         // Vider les entités précédentes
         if (enemies == null) enemies = new ArrayList<>();
         else enemies.clear();
+        if (items == null) items = new ArrayList<>();
+        else items.clear();
 
         // Player
         if (maze.getPlayerSpawn() != null) {
             Entity p = EntityFactory.createEntity(EntityType.PLAYER, maze.getPlayerSpawn());
-            if (p != null) {
-                this.player = (Player) p;
-            }
+            if (p != null) this.player = (Player) p;
         }
-
         if (player == null) return;
 
         // Positions occupées pour éviter collisions
         Set<Position> occupiedPositions = new HashSet<>();
         occupiedPositions.add(player.getPosition());
 
+        // Ennemis
         List<Position> spawns = maze.getEnemySpawns();
-        if (spawns == null || spawns.isEmpty()) return;
-
-        int enemiesToSpawn = switch (currentLevel) {
-            case 1 -> 1;
-            case 2 -> 2;
-            case 3 -> 3;
-            default -> 0;
-        };
-
-        for (int i = 0; i < enemiesToSpawn; i++) {
-            // Choisir un spawn aléatoire parmi les points disponibles
-            Position spawnPos = spawns.get(random.nextInt(spawns.size()));
-
-            // Trouver une position libre proche du spawn
-            Position pos = findFreePositionNear(spawnPos, occupiedPositions);
-
-            // Si aucune position libre trouvée, on tente un autre spawn (limité), sinon on skip
-            if (pos == null) {
-                boolean found = false;
-                for (int attempt = 0; attempt < spawns.size(); attempt++) {
-                    Position trySpawn = spawns.get((i + attempt) % spawns.size());
-                    pos = findFreePositionNear(trySpawn, occupiedPositions);
-                    if (pos != null) { found = true; break; }
-                }
-                if (!found) {
-                    // impossible de spawn davantage d'ennemis sans collision
-                    break;
-                }
+        if (spawns != null && !spawns.isEmpty()) {
+            int maxEnemies;
+            switch (currentLevel) {
+                case 1 -> maxEnemies = 1;
+                case 2 -> maxEnemies = 2;
+                case 3 -> maxEnemies = 3;
+                default -> maxEnemies = 0;
             }
 
-            Enemy e = (Enemy) EntityFactory.createEntity(getRandomEnemyType(), pos);
-            if (e != null) {
-                e.setPosition(pos);
-                enemies.add(e);
-                occupiedPositions.add(pos);
+            // Spawner exactement maxEnemies ennemis
+            for (int i = 0; i < maxEnemies; i++) {
+                Position spawnPos = spawns.get(random.nextInt(spawns.size()));
+                Position pos = findFreePositionNear(spawnPos, occupiedPositions);
+
+                if (pos == null) {
+                    boolean found = false;
+                    for (int attempt = 0; attempt < spawns.size(); attempt++) {
+                        Position trySpawn = spawns.get((i + attempt) % spawns.size());
+                        pos = findFreePositionNear(trySpawn, occupiedPositions);
+                        if (pos != null) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) continue;
+                }
+
+                Enemy e = (Enemy) EntityFactory.createEntity(getRandomEnemyType(), pos);
+                if (e != null) {
+                    e.setPosition(pos);
+                    enemies.add(e);
+                    occupiedPositions.add(pos);
+                }
             }
         }
+
+        // Clés, portes, sortie
         for (Position keyPos : maze.getKeyPosition()) {
             Entity key = EntityFactory.createEntity(EntityType.KEY, keyPos);
             if (key != null) items.add(key);
@@ -199,7 +199,6 @@ public class Game {
             Entity exit = EntityFactory.createEntity(EntityType.EXIT, maze.getExitPosition());
             if (exit != null) items.add(exit);
         }
-
     }
 
     private Position findFreePositionNear(Position pos, Set<Position> occupied) {

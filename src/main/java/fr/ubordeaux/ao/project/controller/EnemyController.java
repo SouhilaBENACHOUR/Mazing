@@ -17,7 +17,6 @@ public class EnemyController implements Predicate<ICharacter<?>> {
     private final MazeGraph mazeGraph;
     private final Maze maze;
 
-
     public EnemyController(Enemy model, EnemyView view, Player player, MazeGraph mazeGraph, Maze maze) {
         this.model = model;
         this.view = view;
@@ -34,13 +33,15 @@ public class EnemyController implements Predicate<ICharacter<?>> {
 
     /** Méthode update appelée à chaque frame */
     public void update() {
-
-        // 1) Mise à jour du modèle
+        //  Mise à jour du modèle (toujours nécessaire)
         model.update(player, mazeGraph, maze);
 
-        // 2) Mise à jour de la vue
-        float x = model.getPosition().getX();
-        float y = model.getPosition().getY();
-        view.setPosition(x, y, 0);
+        // Mise à jour de la vue (seulement si elle existe)
+        if (view != null) {
+            float x = model.getPosition().getX();
+            float y = model.getPosition().getY();
+            view.setPosition(x, y, 0);
+        }
+
     }
 }

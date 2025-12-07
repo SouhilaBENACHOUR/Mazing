@@ -15,9 +15,11 @@ public class Door extends Entity {
     public void tryOpen(Player player) {
         if (locked && player.hasKey()) {
             locked = false;
+            open = true;
             player.useKey();
         }
     }
+
 
     @Override
     public boolean isCrossable(Player player) {
@@ -29,5 +31,9 @@ public class Door extends Entity {
 
     public void open() {
         open = true;
+    }
+
+    public boolean isOpen() {
+        return open;
     }
 }

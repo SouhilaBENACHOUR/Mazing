@@ -3,7 +3,6 @@ package fr.ubordeaux.ao.project.controller;
 import fr.ubordeaux.ao.project.view.GameView;
 import fr.ubordeaux.ao.project.model.Game;
 import fr.ubordeaux.ao.project.model.entities.Enemy;
-import fr.ubordeaux.ao.project.view.EnemyView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,14 +31,10 @@ public class GameController {
 
         for (Enemy enemy : game.getEnemies()) {
 
-            // --- 1) Créer la vue ---
-            EnemyView view = new EnemyView(enemy);
-
-
-            // --- 2) Créer le contrôleur avec MazeGraph pour le pathfinding ---
+            // ---  Créer le contrôleur avec MazeGraph pour le pathfinding ---
             EnemyController ctrl = new EnemyController(
                     enemy,
-                    view,
+                    null,
                     game.getPlayer(),
                     game.getMazeGraph(),
                     game.getMaze()
