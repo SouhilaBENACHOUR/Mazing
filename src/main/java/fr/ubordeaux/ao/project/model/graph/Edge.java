@@ -18,7 +18,7 @@ public class Edge {
         this.weight = weight;
     }
 
-    // --- Getters ---
+
 
     public Node getSource() {
         return source;

@@ -101,7 +101,7 @@ public class Game {
                 notifyObservers();
                 return;
             }
-            // Déplacement du joueur
+
             player.setPreviousPosition(currentPos);
             player.setPosition(targetPos);
             player.setDirection(direction);
@@ -129,24 +129,23 @@ public class Game {
 
 
     private void populateEntitiesFromMaze() {
-        // Vider les entités précédentes
+
         if (enemies == null) enemies = new ArrayList<>();
         else enemies.clear();
         if (items == null) items = new ArrayList<>();
         else items.clear();
 
-        // Player
+
         if (maze.getPlayerSpawn() != null) {
             Entity p = EntityFactory.createEntity(EntityType.PLAYER, maze.getPlayerSpawn());
             if (p != null) this.player = (Player) p;
         }
         if (player == null) return;
 
-        // Positions occupées pour éviter collisions
+
         Set<Position> occupiedPositions = new HashSet<>();
         occupiedPositions.add(player.getPosition());
 
-        // Ennemis
         List<Position> spawns = maze.getEnemySpawns();
         if (spawns != null && !spawns.isEmpty()) {
             int maxEnemies;
@@ -157,8 +156,8 @@ public class Game {
                 default -> maxEnemies = 0;
             }
 
-            // Spawner exactement maxEnemies ennemis
-            for (int i = 0; i < maxEnemies; i++) {
+
+            for (int i = 0; i <= maxEnemies;) {
                 Position spawnPos = spawns.get(random.nextInt(spawns.size()));
                 Position pos = findFreePositionNear(spawnPos, occupiedPositions);
 
@@ -184,7 +183,7 @@ public class Game {
             }
         }
 
-        // Clés, portes, sortie
+
         for (Position keyPos : maze.getKeyPosition()) {
             Entity key = EntityFactory.createEntity(EntityType.KEY, keyPos);
             if (key != null) items.add(key);
@@ -233,7 +232,7 @@ public class Game {
     private void checkCollisions() {
         if (player == null) return;
 
-        // Collision avec ennemis
+
         for (Enemy enemy : enemies) {
             if (player.getPosition().distanceTo(enemy.getPosition()) < GameConfig.COLLISION_DISTANCE) {
                 player.takeDamage();
@@ -245,7 +244,7 @@ public class Game {
             }
         }
 
-        // Collision avec items (clés, portes, exit, autres)
+
         Iterator<Entity> itemIterator = items.iterator();
         while (itemIterator.hasNext()) {
             Entity item = itemIterator.next();
@@ -261,7 +260,6 @@ public class Game {
                         player.useKey();
                         door.open();
                     } else {
-                        // Revenir à la position précédente si la porte est fermée
                         player.setPosition(player.getPreviousPosition());
                     }
                 } else if (item instanceof Exit) {
@@ -269,7 +267,6 @@ public class Game {
                     score += 1000;
                     System.out.println("NIVEAU TERMINE !");
                 } else {
-                    // Pour tout autre item traversable
                     item.onContact(player);
                     if (item.isConsumed()) itemIterator.remove();
                 }

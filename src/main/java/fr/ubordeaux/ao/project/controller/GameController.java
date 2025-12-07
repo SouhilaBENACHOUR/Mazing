@@ -31,7 +31,6 @@ public class GameController {
 
         for (Enemy enemy : game.getEnemies()) {
 
-            // ---  Créer le contrôleur avec MazeGraph pour le pathfinding ---
             EnemyController ctrl = new EnemyController(
                     enemy,
                     null,

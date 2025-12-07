@@ -26,11 +26,10 @@ public class Player extends Entity {
         this.isMoving = false;
 
     }
-    // Getter pour la vitesse
+
     public double getSpeed() {
         return speed;
     }
-    // --- Méthodes appelées par Game.java ---
 
     public void update() {
     }
@@ -49,9 +48,6 @@ public class Player extends Entity {
         this.isMoving = false;
     }
 
-    // --- Getters & Setters ---
-
-    // getPosition() est hérité de Entity, mais setPosition est spécifique
     public void setPosition(Position newPosition) {
         this.position = newPosition;
     }
@@ -61,7 +57,6 @@ public class Player extends Entity {
     public boolean isMoving() { return this.isMoving; }
     public void setIsMoving(boolean moving) { this.isMoving = moving; }
 
-    // --- Méthodes du Ticket PLAYER-2 ---
 
     public void loseLife() {
         if (this.lives > 0) {

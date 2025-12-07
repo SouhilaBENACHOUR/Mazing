@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class MazeGraph {
 
-    // Une Map est parfaite pour retrouver un Nœud à partir de sa Position
+
     final Map<Position, Node> nodes;
 
     public MazeGraph() {
@@ -29,9 +29,9 @@ public class MazeGraph {
      * @param maze Le labyrinthe (grille) chargé depuis un fichier.
      */
     public void buildGraph(Maze maze) {
-        nodes.clear(); // Vider le graphe précédent
+        nodes.clear();
 
-        // --- 1ère Étape : Créer un Nœud pour chaque case praticable ---
+
         for (int y = 0; y < maze.getHeight(); y++) {
             for (int x = 0; x < maze.getWidth(); x++) {
                 if (maze.isWalkable(x, y)) {
@@ -42,20 +42,20 @@ public class MazeGraph {
             }
         }
 
-        // --- 2ème Étape : Créer les Arêtes entre les Nœuds voisins ---
+
         for (Node sourceNode : nodes.values()) {
             Position sourcePos = sourceNode.getPosition();
             
-            // Vérifier les 4 voisins (Nord, Sud, Est, Ouest)
+
             for (Direction dir : Direction.values()) {
                 Position neighborPos = sourcePos.getNeighbor(dir);
                 
-                // Vérifier si ce voisin existe dans notre Map de nœuds
+
                 Node targetNode = nodes.get(neighborPos);
                 
                 if (targetNode != null) {
-                    // Si le voisin est aussi un nœud praticable, créer une arête
-                    Edge edge = new Edge(sourceNode, targetNode, 1.0); // Poids de 1
+
+                    Edge edge = new Edge(sourceNode, targetNode, 1.0);
                     sourceNode.addEdge(edge);
                 }
             }

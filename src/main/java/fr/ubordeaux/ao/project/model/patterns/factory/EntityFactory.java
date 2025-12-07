@@ -1,9 +1,6 @@
 package fr.ubordeaux.ao.project.model.patterns.factory;
-
-// Imports nécessaires pour créer les entités
 import fr.ubordeaux.ao.project.model.entities.*;
 import fr.ubordeaux.ao.project.model.graph.Position;
-// (P2 devra ajouter les imports pour Key, Door, Exit, etc.)
 
 /**
  * Fichier "Bouchon" (Stub) pour la Personne 2.
@@ -21,12 +18,9 @@ public class EntityFactory {
      */
     public static Entity createEntity(EntityType type, Position pos) {
 
-        // P2 devra implémenter la logique complète ici
-        // Pour l'instant, nous créons les stubs minimums pour que P1 fonctionne
-
         switch (type) {
             case PLAYER:
-                return new Player(pos); // P1 a besoin de ça
+                return new Player(pos);
             case ENEMY_SMALL:
                 return new Enemy(pos, Enemy.Size.SMALL);
             case ENEMY_MEDIUM:
@@ -35,9 +29,7 @@ public class EntityFactory {
                 return new Enemy(pos, Enemy.Size.LARGE);
 
             case WALL:
-                return new Wall(pos); // P1 a besoin de ça (pour isWalkable)
-
-            // P2 ajoutera KEY, DOOR, EXIT...
+                return new Wall(pos);
              case KEY:
                return new Key(pos);
             case DOOR:
@@ -46,7 +38,6 @@ public class EntityFactory {
                return new Exit(pos);
 
             default:
-                // Pour FLOOR (' ') ou les types inconnus
                 return null;
         }
     }

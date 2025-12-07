@@ -150,7 +150,6 @@ public class Maze {
         }
     }
 
-    // Getters
 
     /**
      * @return La largeur du labyrinthe

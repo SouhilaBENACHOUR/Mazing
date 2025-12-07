@@ -8,20 +8,10 @@ public class GameConfig {
      * Aucune valeur ne doit être codée en dur dans le code.
      */
 
-    // ========================================
-    // CONSTANTES DE FENÊTRE
-    // ========================================
-
-    //Largeur de la fenêtre de jeu en pixels.
-
     public static final int WINDOW_WIDTH = 1000;
 
-    //Hauteur de la fenêtre de jeu en pixels.
 
     public static final int WINDOW_HEIGHT = 1200;
-
-    // Nombre d'images par seconde.
-    //Le jeu tourne à 30 FPS.
 
     public static final int FPS = 30;
 
@@ -30,13 +20,6 @@ public class GameConfig {
      * Calculé à partir du FPS : 1000ms / 30 = 33ms par frame.
      */
     public static final int FRAME_DURATION_MS = 1000 / FPS;
-
-
-    // ========================================
-    // CONSTANTES DE LABYRINTHE
-    // ========================================
-
-    //Taille d'une tuile du labyrinthe en pixels.
 
     public static final int TILE_SIZE = 64;
 
@@ -53,15 +36,9 @@ public class GameConfig {
     public static final int DEFAULT_MAZE_HEIGHT = 10;
 
 
-    // ========================================
-    // CODES MAZING
-    // ========================================
-
-    //Code Mazing pour le sol (walkable).
 
     public static final int FLOOR_CODE = 0;
 
-    //Code Mazing pour les murs (non walkable).
 
     public static final int WALL_CODE = 131;
 
@@ -71,9 +48,6 @@ public class GameConfig {
      */
     public static final int EXIT_CODE = 300;
 
-// ========================================
-// CODES MAZING - OBJETS
-// ========================================
 
     /**
      * Code Mazing pour le coffre (représente la clé).
@@ -82,35 +56,23 @@ public class GameConfig {
 
 
 
-    // ========================================
-// CODES MAZING - PORTES
-// ========================================
 
     /**
      * Codes Mazing pour les portes fermées.
      */
-    public static final int DOOR_CLOSED_HORIZONTAL = 161;  // Porte horizontale fermée
-    public static final int DOOR_CLOSED_VERTICAL = 163;    // Porte verticale fermée
+    public static final int DOOR_CLOSED_HORIZONTAL = 161;
+    public static final int DOOR_CLOSED_VERTICAL = 163;
 
     /**
      * Codes Mazing pour les portes ouvertes.
      */
-    public static final int DOOR_OPEN_HORIZONTAL = 165;    // Porte horizontale ouverte
-    public static final int DOOR_OPEN_VERTICAL = 166;      // Porte verticale ouverte
+    public static final int DOOR_OPEN_HORIZONTAL = 165;
+    public static final int DOOR_OPEN_VERTICAL = 166;
 
-    // ========================================
-    // CONSTANTES DE GAMEPLAY
-    // ========================================
-
-    //Le joueur se déplace de 1 case par appui de touche.
 
     public static final float PLAYER_SPEED = 1.0f;
 
-    //Les ennemis sont légèrement plus lents que le joueur.
-
     public static final float ENEMY_SPEED = 0.8f;
-
-    //Nombre de vies du joueur au démarrage du jeu.
 
     public static final int PLAYER_LIVES = 3;
 
@@ -127,42 +89,23 @@ public class GameConfig {
     public static final float COLLISION_DISTANCE = 0.8f;
 
 
-    // ========================================
-    // CARACTÈRES DU FICHIER DE NIVEAU
-    // ========================================
-
-    //Caractère représentant le sol dans le fichier de niveau.
-
     public static final char LEVEL_FLOOR = '0';
-
-    //Caractère représentant un mur dans le fichier de niveau.
 
     public static final char LEVEL_WALL = '1';
 
-    //Caractère représentant le spawn du joueur dans le fichier de niveau.
 
     public static final char LEVEL_PLAYER_SPAWN = 'P';
 
-    //Caractère représentant le spawn d'un ennemi dans le fichier de niveau.
-
     public static final char LEVEL_ENEMY_SPAWN = 'E';
 
-    //Caractère représentant une clé dans le fichier de niveau.
 
     public static final char LEVEL_KEY = 'K';
 
-    //Caractère représentant une porte dans le fichier de niveau.
 
     public static final char LEVEL_DOOR = 'D';
 
-    //Caractère représentant la sortie dans le fichier de niveau.
-
     public static final char LEVEL_EXIT = 'X';
 
-
-    // ========================================
-    // CHEMINS DES RESSOURCES
-    // ========================================
 
     /**
      * Chemin vers le répertoire contenant les niveaux.
@@ -174,10 +117,6 @@ public class GameConfig {
      */
     public static final String LEVEL1_FILE = "level1.json";
 
-
-    // ========================================
-    // CONSTRUCTEUR PRIVÉ
-    // ========================================
 
     /**
      * Constructeur privé pour empêcher l'instanciation.

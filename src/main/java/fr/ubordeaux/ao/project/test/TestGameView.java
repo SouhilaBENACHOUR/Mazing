@@ -14,17 +14,17 @@ public class TestGameView {
         System.out.println("=== Test d'affichage avec Mazing ===\n");
 
         try {
-            // Charger le niveau
             Maze maze = new Maze("level1.json");
 
-            // Créer la vue
-            IWindowGame windowGame = new WindowGame(); // 1. Créez la fenêtre
-            GameView view = new GameView(windowGame);            System.out.println("Fenêtre créée et labyrinthe affiché !");
+
+            IWindowGame windowGame = new WindowGame();
+            GameView view = new GameView(windowGame);
+            System.out.println("Fenêtre créée et labyrinthe affiché !");
 
             System.out.println("\nFenêtre ouverte. Regardez l'écran !");
             System.out.println("Fermez la fenêtre pour terminer le programme.");
 
-            // Garder le programme en vie
+
             Thread.sleep(Long.MAX_VALUE);
 
         } catch (Exception e) {

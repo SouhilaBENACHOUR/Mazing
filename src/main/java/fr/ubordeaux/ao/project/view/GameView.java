@@ -137,7 +137,7 @@ public class GameView implements GameObserver {
             updatedViews.put(enemy, view);
         }
 
-        // Remplacer l'ancienne map par la nouvelle
+
         enemyViews = updatedViews;
     }
     /**
@@ -177,7 +177,7 @@ public class GameView implements GameObserver {
     public void drawItems(Maze maze) {
         if (maze == null) return;
 
-        // 1. Dessiner le coffre (clé)
+
         if (maze.getKeyPosition() != null) {
             List<Position> keyPositions = maze.getKeyPosition();
             for (Position keyPos : keyPositions) {
@@ -187,8 +187,6 @@ public class GameView implements GameObserver {
             }
         }
 
-
-        // 2. Dessiner toutes les portes
         if (maze.getDoorPositions() != null) {
             for (Position doorPos : maze.getDoorPositions()) {
                 int doorCode = getDoorCode((int) doorPos.getX(),
@@ -202,7 +200,6 @@ public class GameView implements GameObserver {
             }
         }
 
-        // 3. Dessiner la sortie
         if (maze.getExitPosition() != null) {
             Position exitPos = maze.getExitPosition();
             windowGame.add(GameConfig.EXIT_CODE,

@@ -30,24 +30,24 @@ public class KeyboardController extends KeyAdapter {
         int keyCode = e.getKeyCode();
 
         if (game.isGameOver() || game.isLevelComplete()) {
-            return; // Ne rien faire si le jeu est terminé
+            return;
         }
 
         switch (keyCode) {
             case KeyEvent.VK_UP:
-            case KeyEvent.VK_Z: // Pour ZQSD
+            case KeyEvent.VK_Z:
                 game.handlePlayerMove(Direction.NORTH);
                 break;
             case KeyEvent.VK_DOWN:
-            case KeyEvent.VK_S: // Pour ZQSD
+            case KeyEvent.VK_S:
                 game.handlePlayerMove(Direction.SOUTH);
                 break;
             case KeyEvent.VK_LEFT:
-            case KeyEvent.VK_Q: // Pour ZQSD
+            case KeyEvent.VK_Q:
                 game.handlePlayerMove(Direction.WEST);
                 break;
             case KeyEvent.VK_RIGHT:
-            case KeyEvent.VK_D: // Pour ZQSD
+            case KeyEvent.VK_D:
                 game.handlePlayerMove(Direction.EAST);
                 break;
         }
@@ -62,13 +62,11 @@ public class KeyboardController extends KeyAdapter {
     public void keyReleased(KeyEvent e) {
         int keyCode = e.getKeyCode();
 
-        // Vérifie si c'était une touche de mouvement
         if (keyCode == KeyEvent.VK_UP || keyCode == KeyEvent.VK_Z ||
                 keyCode == KeyEvent.VK_DOWN || keyCode == KeyEvent.VK_S ||
                 keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_Q ||
                 keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_D) {
 
-            // Dit au modèle que le joueur s'est arrêté de bouger
             game.handlePlayerStop();
         }
     }

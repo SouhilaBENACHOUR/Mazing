@@ -20,47 +20,46 @@ public class PathFinder {
      */
     public List<Position> findPath(MazeGraph graph, Node startNode, Node endNode) {
         
-        // Structures de données pour Dijkstra
+
         Map<Node, Double> distances = new HashMap<>();
         Map<Node, Node> previousNodes = new HashMap<>();
         PriorityQueue<Node> priorityQueue = new PriorityQueue<>(
             Comparator.comparingDouble(distances::get)
         );
 
-        // 1. Initialisation
+
         for (Node node : graph.nodes.values()) {
             distances.put(node, Double.POSITIVE_INFINITY);
         }
         distances.put(startNode, 0.0);
         priorityQueue.add(startNode);
 
-        // 2. Boucle principale de Dijkstra
+
         while (!priorityQueue.isEmpty()) {
             Node currentNode = priorityQueue.poll();
 
-            // Si on a atteint la destination
+
             if (currentNode.equals(endNode)) {
-                break; // Chemin trouvé
+                break;
             }
 
-            // Parcourir les voisins
+
             for (Edge edge : currentNode.getEdges()) {
                 Node neighbor = edge.getTarget();
                 double newDist = distances.get(currentNode) + edge.getWeight();
 
                 if (newDist < distances.get(neighbor)) {
-                    // Un chemin plus court a été trouvé vers ce voisin
                     distances.put(neighbor, newDist);
                     previousNodes.put(neighbor, currentNode);
                     
-                    // Mettre à jour la file de priorité
-                    priorityQueue.remove(neighbor); // Retirer l'ancienne entrée (si elle existe)
-                    priorityQueue.add(neighbor); // Ajouter la nouvelle avec la distance mise à jour
+
+                    priorityQueue.remove(neighbor);
+                    priorityQueue.add(neighbor);
                 }
             }
         }
 
-        // 3. Reconstruction du chemin
+
         return reconstructPath(previousNodes, startNode, endNode);
     }
 
@@ -72,19 +71,16 @@ public class PathFinder {
         List<Position> path = new ArrayList<>();
         Node current = endNode;
 
-        // Si endNode n'est pas dans previousNodes (et n'est pas startNode),
-        // cela signifie qu'aucun chemin n'a été trouvé.
         if (previousNodes.get(current) == null && !current.equals(startNode)) {
-            return path; // Retourne un chemin vide
+            return path;
         }
-        
-        // Remonter de la fin au début
+
         while (current != null) {
             path.add(current.getPosition());
             current = previousNodes.get(current);
         }
 
-        // Le chemin est à l'envers (de la fin au début), il faut le retourner
+
         Collections.reverse(path);
         return path;
     }

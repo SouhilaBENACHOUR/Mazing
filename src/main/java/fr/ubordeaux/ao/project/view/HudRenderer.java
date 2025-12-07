@@ -45,8 +45,7 @@ public class HudRenderer {
     public void draw(Game game) {
         livesLabel.setText("Vies: " + game.getLives());
 
-        // NE PAS toucher au gameOverLabel ici
-        // Les messages sont gérés par showTemporaryMessage() dans Main.java
+
     }
 
     /**

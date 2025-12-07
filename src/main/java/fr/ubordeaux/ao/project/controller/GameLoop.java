@@ -12,12 +12,10 @@ import fr.ubordeaux.ao.project.view.GameView;
 public class GameLoop implements Runnable {
 
     private Game game;
-    private GameView gameView; // La vue (pour l'instant non utilisée ici)
+    private GameView gameView;
     private boolean isRunning;
-
-    // Vitesse du jeu: 60 "ticks" par seconde
     private static final int TARGET_FPS = 60;
-    private static final long OPTIMAL_TIME = 1000 / TARGET_FPS; // (en millisecondes)
+    private static final long OPTIMAL_TIME = 1000 / TARGET_FPS;
 
     public GameLoop(Game game, GameView gameView) {
         this.game = game;
@@ -32,16 +30,8 @@ public class GameLoop implements Runnable {
     public void run() {
 
         while (isRunning) {
-
-            // --- 1. Mettre à jour la logique du jeu ---
-            // (Ceci va appeler checkCollisions, updateEnemies, etc.
-            // et notifier la GameView grâce au pattern Observer)
             game.updateGame();
 
-
-            // --- 2. Pause ---
-            // Contrôle la vitesse du jeu pour qu'il ne tourne pas
-            // des milliers de fois par seconde.
             try {
                 Thread.sleep(OPTIMAL_TIME);
             } catch (InterruptedException e) {

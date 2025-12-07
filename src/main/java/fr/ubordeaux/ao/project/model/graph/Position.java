@@ -1,8 +1,5 @@
 package fr.ubordeaux.ao.project.model.graph;
-
-// MODIFICATION: Import needed for getNeighbor()
-import fr.ubordeaux.ao.project.model.graph.Direction;
-import java.util.Objects; // (Good practice to add this for equals)
+import java.util.Objects;
 
 /**
  * Position dans le jeu (x, y, z).

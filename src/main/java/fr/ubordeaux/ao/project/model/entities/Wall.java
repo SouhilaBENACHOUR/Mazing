@@ -1,7 +1,6 @@
 package fr.ubordeaux.ao.project.model.entities;
 
 import fr.ubordeaux.ao.project.model.graph.Position;
-import fr.ubordeaux.ao.project.model.entities.Player;
 
 /**
  * Fichier "Bouchon" (Stub) pour la Personne 2.

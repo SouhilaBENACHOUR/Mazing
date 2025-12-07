@@ -28,7 +28,6 @@ public class Node {
         this.edges.add(edge);
     }
 
-    // --- Getters ---
 
     public Position getPosition() {
         return position;

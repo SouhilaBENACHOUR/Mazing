@@ -82,7 +82,6 @@ public class Enemy extends Entity {
     public void update(Player player, MazeGraph mazeGraph, Maze maze) {
         if (!alive) return;
 
-        // Activer l'ennemi uniquement quand le joueur bouge
         if (!canMove && player.isMoving()) {
             canMove = true;
         }
@@ -95,7 +94,7 @@ public class Enemy extends Entity {
         Position pos = getPosition();
         Position playerPos = player.getPosition();
 
-        // Recalculer le chemin si nécessaire
+
         if (!playerPos.equals(lastTargetPosition) || currentPath.isEmpty()) {
             currentPath = findPath(pos, playerPos, mazeGraph);
             lastTargetPosition = playerPos;

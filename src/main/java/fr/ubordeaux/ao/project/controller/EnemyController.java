@@ -33,10 +33,9 @@ public class EnemyController implements Predicate<ICharacter<?>> {
 
     /** Méthode update appelée à chaque frame */
     public void update() {
-        //  Mise à jour du modèle (toujours nécessaire)
+
         model.update(player, mazeGraph, maze);
 
-        // Mise à jour de la vue (seulement si elle existe)
         if (view != null) {
             float x = model.getPosition().getX();
             float y = model.getPosition().getY();

@@ -48,11 +48,9 @@ public class Main {
         String levelFile = "level" + level + ".json";
 
         try {
-            // ✅ NETTOYER AVANT de charger
+
             windowGame.clear();
             gameView.clearEnemies();
-
-            // Maintenant charger le nouveau niveau
             gameModel.setCurrentLevel(level);
             gameModel.loadLevel(levelFile);
 
@@ -60,7 +58,6 @@ public class Main {
                 Thread.sleep(50);
             }
 
-            // Ajustement de la taille des tiles selon le niveau
             switch (level) {
                 case 1 -> windowGame.setTileSize(55);
                 case 2 -> windowGame.setTileSize(50);
@@ -68,7 +65,7 @@ public class Main {
             }
 
             if (gameModel.getMaze() != null) {
-                // Dessiner labyrinthe et objets
+
                 gameView.drawMaze(gameModel.getMaze());
                 gameView.drawItems(gameModel.getMaze());
             }
@@ -83,7 +80,7 @@ public class Main {
     private static void startNewGame() {
         System.out.println("Démarrage d’une nouvelle partie...");
         currentLevel = 1;
-        gameModel.resetLevel();  // réinitialise le jeu
+        gameModel.resetLevel();
         loadLevel(currentLevel);
         System.out.println("Nouvelle partie prête !");
     }

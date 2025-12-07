@@ -8,7 +8,7 @@ package fr.ubordeaux.ao.project.model.graph;
  * afin de faciliter les calculs de position.
  */
 public enum Direction {
-    // Chaque direction stocke son changement en x et y
+
     NORTH(0, -1),
     SOUTH(0, 1),
     EAST(1, 0),

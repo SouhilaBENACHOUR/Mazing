@@ -6,9 +6,6 @@ package fr.ubordeaux.ao.project.model.patterns.factory;
  * * Rôle : Associe un caractère (lu depuis le fichier .txt) à un type d'entité.
  */
 public enum EntityType {
-
-    // Définissez ici les associations entre le type et le caractère
-    // (J'ai repris les caractères de votre exemple de fichier de niveau)
     PLAYER('P'),
     ENEMY_SMALL('S'),
     ENEMY_MEDIUM('M'),
@@ -17,10 +14,9 @@ public enum EntityType {
     WALL('W'),
     DOOR('D'),
     EXIT('X'),
-    FLOOR(' '); // Le sol est aussi une entité (pour P3)
-
-    // --- Attribut ---
+    FLOOR(' ');
     private final char charRepresentation;
+
 
     /**
      * Constructeur privé pour l'énumération.
@@ -46,7 +42,6 @@ public enum EntityType {
      * @return L'EntityType correspondant, ou null si aucun n'est trouvé.
      */
     public static EntityType fromChar(char c) {
-        // Boucle sur toutes les valeurs de l'énumération
         for (EntityType type : EntityType.values()) {
             if (type.getChar() == c) {
                 return type;
