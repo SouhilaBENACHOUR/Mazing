@@ -17,9 +17,10 @@ public class EnemyController implements Predicate<ICharacter<?>> {
     private final MazeGraph mazeGraph;
     private final Maze maze;
 
-    public EnemyController(EnemyView view, Enemy model, Player player, MazeGraph mazeGraph, Maze maze) {
-        this.view = view;
+
+    public EnemyController(Enemy model, EnemyView view, Player player, MazeGraph mazeGraph, Maze maze) {
         this.model = model;
+        this.view = view;
         this.player = player;
         this.mazeGraph = mazeGraph;
         this.maze = maze;
@@ -27,16 +28,19 @@ public class EnemyController implements Predicate<ICharacter<?>> {
 
     @Override
     public boolean test(ICharacter<?> character) {
+        update();
+        return true;
+    }
 
-        // Mise à jour du modèle
+    /** Méthode update appelée à chaque frame */
+    public void update() {
+
+        // 1) Mise à jour du modèle
         model.update(player, mazeGraph, maze);
 
-        // Mise à jour de la vue
+        // 2) Mise à jour de la vue
         float x = model.getPosition().getX();
         float y = model.getPosition().getY();
-
         view.setPosition(x, y, 0);
-
-        return true;
     }
 }

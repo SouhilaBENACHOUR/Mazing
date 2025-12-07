@@ -96,59 +96,33 @@ public class GameView implements GameObserver {
      *
      * @param enemies Le spider à dessiner
      */
-
     private void drawEnemies(List<Enemy> enemies) {
         if (enemies == null) return;
 
-        // 1) Ajouter les EnemyView manquants
-        for (Enemy enemy : enemies) {
-            if (!enemyViews.containsKey(enemy)) {
-                EnemyView view = new EnemyView(enemy);
-                enemyViews.put(enemy, view);
-                // EnemyView extends Spider -> on peut l'ajouter directement
-                windowGame.add(view);
-            }
-        }
-
-        // 2) Mettre à jour les positions et l'animation
+        // Ajouter ou mettre à jour les EnemyView
         for (Enemy enemy : enemies) {
             EnemyView view = enemyViews.get(enemy);
-            if (view != null) {
-                float x = enemy.getPosition().getX();
-                float y = enemy.getPosition().getY();
-                view.setPosition(x, y, 0);
-
-                // Ici on ne tente pas de récupérer enemy.getDirection() (n'existe pas).
-                // Si l'ennemi est mort, jouer l'animation DEATH sinon WALK.
-                try {
-                    if (!enemy.isAlive()) {
-                        view.setMode(Spider.Mode.DEATH);
-                    } else {
-                        view.setMode(Spider.Mode.WALK);
-                    }
-                } catch (NoClassDefFoundError | Exception ignore) {
-                    // Défensive : si Spider.Mode n'est pas disponible pour une raison X,
-                    // on ignore l'exception pour éviter de casser le rendu.
-                }
+            if (view == null) {
+                view = new EnemyView(enemy);
+                enemyViews.put(enemy, view);
+                windowGame.add(view);
             }
+
+            float x = enemy.getPosition().getX();
+            float y = enemy.getPosition().getY();
+            view.setPosition(x, y, 0);
+
+            try {
+                view.setMode(enemy.isAlive() ? Spider.Mode.WALK : Spider.Mode.DEATH);
+            } catch (Throwable ignore) {}
         }
 
-        // 3) Retirer (côté map) les EnemyView dont l'Enemy a disparu.
-        //    On ne fait PAS windowGame.remove(...) (API non disponible).
-        //    On place simplement le sprite hors écran pour le "cacher".
-        //    Puis on supprime l'entrée de la map.
+        // Retirer les ennemis disparus
         enemyViews.entrySet().removeIf(entry -> {
-            Enemy key = entry.getKey();
-            if (!enemies.contains(key)) {
-                EnemyView removedView = entry.getValue();
-                // cacher le sprite hors de la zone de jeu
-                removedView.setPosition(-10f, -10f, 0f);
-                // optionnel : jouer l'animation de mort
-                try {
-                    removedView.setMode(Spider.Mode.DEATH);
-                } catch (Throwable t) {
-
-                }
+            if (!enemies.contains(entry.getKey())) {
+                EnemyView view = entry.getValue();
+                view.setPosition(-10f, -10f, 0);
+                try { view.setMode(Spider.Mode.DEATH); } catch (Throwable ignore) {}
                 return true;
             }
             return false;
@@ -194,12 +168,14 @@ public class GameView implements GameObserver {
 
         // 1. Dessiner le coffre (clé)
         if (maze.getKeyPosition() != null) {
-            Position keyPos = maze.getKeyPosition();
-            windowGame.add(GameConfig.KEY_CODE,
-                    (int) keyPos.getX(),
-                    (int) keyPos.getY(),
-                    0);
+            List<Position> keyPositions = maze.getKeyPosition();
+            for (Position keyPos : keyPositions) {
+                int x = (int) Math.round(keyPos.getX());
+                int y = (int) Math.round(keyPos.getY());
+                windowGame.add(GameConfig.KEY_CODE, x, y, 0);
+            }
         }
+
 
         // 2. Dessiner toutes les portes
         if (maze.getDoorPositions() != null) {

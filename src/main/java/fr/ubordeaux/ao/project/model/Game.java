@@ -1,14 +1,13 @@
 package fr.ubordeaux.ao.project.model;
 
-import fr.ubordeaux.ao.project.model.entities.Enemy;
-import fr.ubordeaux.ao.project.model.entities.Entity;
-import fr.ubordeaux.ao.project.model.entities.Player;
+import fr.ubordeaux.ao.project.model.entities.*;
 import fr.ubordeaux.ao.project.model.graph.MazeGraph;
 import fr.ubordeaux.ao.project.model.graph.Position;
 import fr.ubordeaux.ao.project.model.graph.Direction;
 import fr.ubordeaux.ao.project.model.patterns.factory.EntityFactory;
 import fr.ubordeaux.ao.project.model.patterns.factory.EntityType;
 import fr.ubordeaux.ao.project.model.patterns.observer.GameObserver;
+
 
 import java.util.*;
 
@@ -27,6 +26,8 @@ public class Game {
     private boolean isLevelComplete;
     private boolean isLoading;
     private int currentLevel = 1;
+    private final Random random = new Random();
+
 
     private List<GameObserver> observers;
 
@@ -91,9 +92,6 @@ public class Game {
     public void handlePlayerMove(Direction direction) {
         if (isGameOver || isLevelComplete || player == null) return;
 
-        player.setDirection(direction);
-        player.setIsMoving(true);
-
         Position currentPos = player.getPosition();
         Position targetPos = currentPos.getNeighbor(direction);
 
@@ -103,7 +101,13 @@ public class Game {
                 notifyObservers();
                 return;
             }
+            // Déplacement du joueur
+            player.setPreviousPosition(currentPos);
             player.setPosition(targetPos);
+            player.setDirection(direction);
+            player.setIsMoving(true);
+        } else {
+            player.setIsMoving(false);
         }
 
         notifyObservers();
@@ -116,26 +120,35 @@ public class Game {
         }
     }
 
+
     private EntityType getRandomEnemyType() {
         EntityType[] types = {EntityType.ENEMY_SMALL, EntityType.ENEMY_MEDIUM, EntityType.ENEMY_LARGE};
         int idx = new Random().nextInt(types.length);
         return types[idx];
     }
 
+
     private void populateEntitiesFromMaze() {
+        // Vider les entités précédentes
+        if (enemies == null) enemies = new ArrayList<>();
+        else enemies.clear();
+
+        // Player
         if (maze.getPlayerSpawn() != null) {
             Entity p = EntityFactory.createEntity(EntityType.PLAYER, maze.getPlayerSpawn());
-            if (p != null) this.player = (Player) p;
+            if (p != null) {
+                this.player = (Player) p;
+            }
         }
-
 
         if (player == null) return;
 
+        // Positions occupées pour éviter collisions
         Set<Position> occupiedPositions = new HashSet<>();
         occupiedPositions.add(player.getPosition());
 
         List<Position> spawns = maze.getEnemySpawns();
-        if (spawns.isEmpty()) return;
+        if (spawns == null || spawns.isEmpty()) return;
 
         int enemiesToSpawn = switch (currentLevel) {
             case 1 -> 1;
@@ -145,8 +158,25 @@ public class Game {
         };
 
         for (int i = 0; i < enemiesToSpawn; i++) {
-            Position spawnPos = spawns.get(0); // on prend toujours le premier spawn
+            // Choisir un spawn aléatoire parmi les points disponibles
+            Position spawnPos = spawns.get(random.nextInt(spawns.size()));
+
+            // Trouver une position libre proche du spawn
             Position pos = findFreePositionNear(spawnPos, occupiedPositions);
+
+            // Si aucune position libre trouvée, on tente un autre spawn (limité), sinon on skip
+            if (pos == null) {
+                boolean found = false;
+                for (int attempt = 0; attempt < spawns.size(); attempt++) {
+                    Position trySpawn = spawns.get((i + attempt) % spawns.size());
+                    pos = findFreePositionNear(trySpawn, occupiedPositions);
+                    if (pos != null) { found = true; break; }
+                }
+                if (!found) {
+                    // impossible de spawn davantage d'ennemis sans collision
+                    break;
+                }
+            }
 
             Enemy e = (Enemy) EntityFactory.createEntity(getRandomEnemyType(), pos);
             if (e != null) {
@@ -155,24 +185,56 @@ public class Game {
                 occupiedPositions.add(pos);
             }
         }
+        for (Position keyPos : maze.getKeyPosition()) {
+            Entity key = EntityFactory.createEntity(EntityType.KEY, keyPos);
+            if (key != null) items.add(key);
+        }
 
+        for (Position doorPos : maze.getDoorPositions()) {
+            Entity door = EntityFactory.createEntity(EntityType.DOOR, doorPos);
+            if (door != null) items.add(door);
+        }
+
+        if (maze.getExitPosition() != null) {
+            Entity exit = EntityFactory.createEntity(EntityType.EXIT, maze.getExitPosition());
+            if (exit != null) items.add(exit);
+        }
 
     }
 
     private Position findFreePositionNear(Position pos, Set<Position> occupied) {
-        int[][] offsets = {{1,0},{-1,0},{0,1},{0,-1},{1,1},{-1,-1},{1,-1},{-1,1}};
+
+        if (maze.isWalkable((int) pos.getX(), (int) pos.getY())
+                && !occupied.contains(pos)) {
+            return pos;
+        }
+
+
+        int[][] offsets = {
+                {1,0}, {-1,0}, {0,1}, {0,-1},
+                {1,1}, {-1,-1}, {1,-1}, {-1,1}
+        };
+
         for (int[] o : offsets) {
-            Position newPos = new Position((int) (pos.getX() + o[0]), (int) (pos.getY() + o[1]));
-            if (maze.isWalkable((int) newPos.getX(), (int) newPos.getY()) && !occupied.contains(newPos)) {
+            Position newPos = new Position(
+                    (int) pos.getX() + o[0],
+                    (int) pos.getY() + o[1]
+            );
+
+            if (maze.isWalkable((int) newPos.getX(), (int) newPos.getY())
+                    && !occupied.contains(newPos)) {
                 return newPos;
             }
         }
-        return pos;
+
+        return null;
     }
+
 
     private void checkCollisions() {
         if (player == null) return;
 
+        // Collision avec ennemis
         for (Enemy enemy : enemies) {
             if (player.getPosition().distanceTo(enemy.getPosition()) < GameConfig.COLLISION_DISTANCE) {
                 player.takeDamage();
@@ -184,13 +246,34 @@ public class Game {
             }
         }
 
+        // Collision avec items (clés, portes, exit, autres)
         Iterator<Entity> itemIterator = items.iterator();
         while (itemIterator.hasNext()) {
             Entity item = itemIterator.next();
             if (item == null) continue;
+
             if (player.getPosition().distanceTo(item.getPosition()) < GameConfig.COLLISION_DISTANCE) {
-                item.onContact(player);
-                if (item.isConsumed()) itemIterator.remove();
+                if (item instanceof Key key) {
+                    player.collectKey(key);
+                    key.consume();
+                    itemIterator.remove();
+                } else if (item instanceof Door door) {
+                    if (player.hasKey()) {
+                        player.useKey();
+                        door.open();
+                    } else {
+                        // Revenir à la position précédente si la porte est fermée
+                        player.setPosition(player.getPreviousPosition());
+                    }
+                } else if (item instanceof Exit) {
+                    isLevelComplete = true;
+                    score += 1000;
+                    System.out.println("NIVEAU TERMINE !");
+                } else {
+                    // Pour tout autre item traversable
+                    item.onContact(player);
+                    if (item.isConsumed()) itemIterator.remove();
+                }
             }
         }
     }
@@ -259,4 +342,5 @@ public class Game {
     public void setLoading(boolean loading) { this.isLoading = loading; }
 
 
+    public MazeGraph getMazeGraph() { return mazeGraph; }
 }

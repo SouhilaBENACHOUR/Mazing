@@ -9,26 +9,32 @@ import fr.ubordeaux.ao.project.model.graph.Direction;
  * * Rôle : Gérer l'état du joueur (position, vies, direction, mouvement).
  * Hérite de Entity (P2).
  */
-public class Player extends Entity { // <-- MODIFICATION IMPORTANTE
-
+public class Player extends Entity {
+    private int keys = 0;
     private int lives;
     private boolean isAlive;
     private Direction direction;
     private boolean isMoving;
+    private Position previousPosition;
+    private double speed = 0.2;
 
     public Player(Position startPosition) {
-        super(startPosition); // Appelle le constructeur de Entity
+        super(startPosition);
         this.lives = 3;
         this.isAlive = true;
         this.direction = Direction.SOUTH;
         this.isMoving = false;
-    }
 
+    }
+    // Getter pour la vitesse
+    public double getSpeed() {
+        return speed;
+    }
     // --- Méthodes appelées par Game.java ---
 
     public void update() {
-        // (P2 peut utiliser ça pour le State Pattern)
     }
+
 
     public void takeDamage() {
         if (isAlive) {
@@ -37,7 +43,7 @@ public class Player extends Entity { // <-- MODIFICATION IMPORTANTE
     }
 
     public void respawn(Position startPosition) {
-        this.position = startPosition; // "position" vient de Entity
+        this.position = startPosition;
         this.isAlive = true;
         this.direction = Direction.SOUTH;
         this.isMoving = false;
@@ -73,4 +79,10 @@ public class Player extends Entity { // <-- MODIFICATION IMPORTANTE
     public int getLives() {
         return this.lives;
     }
+
+    public void collectKey(Key key) { keys++; }
+    public boolean hasKey() { return keys > 0; }
+    public void useKey() { if (keys > 0) keys--; }
+    public Position getPreviousPosition() { return previousPosition; }
+    public void setPreviousPosition(Position pos) { this.previousPosition = pos; }
 }

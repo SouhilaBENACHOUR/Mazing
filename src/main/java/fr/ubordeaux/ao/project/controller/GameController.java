@@ -1,24 +1,60 @@
 package fr.ubordeaux.ao.project.controller;
 
 import fr.ubordeaux.ao.project.view.GameView;
+import fr.ubordeaux.ao.project.model.Game;
+import fr.ubordeaux.ao.project.model.entities.Enemy;
+import fr.ubordeaux.ao.project.view.EnemyView;
 
-/**
- * Fichier "Bouchon" (Stub) pour la Personne 3.
- * Contrôleur principal qui assemble les autres composants.
- * * Rôle : Fait le lien entre la Vue et le Contrôleur Clavier.
- */
+import java.util.ArrayList;
+import java.util.List;
+
 public class GameController {
 
-    /**
-     * Constructeur appelé par Main.java.
-     * @param gameView La fenêtre de jeu (pour y attacher le clavier).
-     * @param keyboardController Le gestionnaire de clavier.
-     */
-    public GameController(GameView gameView, KeyboardController keyboardController) {
+    private final GameView gameView;
+    private final KeyboardController keyboardController;
 
-        // Cette ligne est cruciale :
-        // Elle dit à la fenêtre (GameView) d'écouter
-        // les événements provenant du clavier (KeyboardController).
-        gameView.addKeyListener(keyboardController);
+    private final List<EnemyController> enemyControllers = new ArrayList<>();
+
+    public GameController(GameView gameView, KeyboardController keyboardController) {
+        this.gameView = gameView;
+        this.keyboardController = keyboardController;
+
+        // Permet d'écouter les touches du clavier
+        this.gameView.addKeyListener(this.keyboardController);
+    }
+
+    /**
+     * Appelé après game.populateEntitiesFromMaze()
+     * Crée les EnemyController et lie chaque Enemy à sa vue.
+     */
+    public void attachEnemyControllers(Game game) {
+        enemyControllers.clear();
+
+        for (Enemy enemy : game.getEnemies()) {
+
+            // --- 1) Créer la vue ---
+            EnemyView view = new EnemyView(enemy);
+
+
+            // --- 2) Créer le contrôleur avec MazeGraph pour le pathfinding ---
+            EnemyController ctrl = new EnemyController(
+                    enemy,
+                    view,
+                    game.getPlayer(),
+                    game.getMazeGraph(),
+                    game.getMaze()
+            );
+
+            enemyControllers.add(ctrl);
+        }
+    }
+
+    /**
+     * Mise à jour des ennemis (appelée à chaque frame)
+     */
+    public void update() {
+        for (EnemyController ctrl : enemyControllers) {
+            ctrl.update();
+        }
     }
 }

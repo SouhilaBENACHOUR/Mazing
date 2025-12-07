@@ -1,11 +1,8 @@
 package fr.ubordeaux.ao.project.model.patterns.factory;
 
 // Imports nécessaires pour créer les entités
+import fr.ubordeaux.ao.project.model.entities.*;
 import fr.ubordeaux.ao.project.model.graph.Position;
-import fr.ubordeaux.ao.project.model.entities.Entity;
-import fr.ubordeaux.ao.project.model.entities.Player;
-import fr.ubordeaux.ao.project.model.entities.Enemy;
-import fr.ubordeaux.ao.project.model.entities.Wall;
 // (P2 devra ajouter les imports pour Key, Door, Exit, etc.)
 
 /**
@@ -41,12 +38,12 @@ public class EntityFactory {
                 return new Wall(pos); // P1 a besoin de ça (pour isWalkable)
 
             // P2 ajoutera KEY, DOOR, EXIT...
-            // case KEY:
-            //    return new Key(pos);
-            // case DOOR:
-            //    return new Door(pos);
-            // case EXIT:
-            //    return new Exit(pos);
+             case KEY:
+               return new Key(pos);
+            case DOOR:
+               return new Door(pos);
+             case EXIT:
+               return new Exit(pos);
 
             default:
                 // Pour FLOOR (' ') ou les types inconnus

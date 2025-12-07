@@ -6,6 +6,8 @@ import fr.ubordeaux.ao.project.model.patterns.factory.EntityType;
 public class Entity {
 
     protected Position position;
+    private boolean consumed = false;
+
 
     public Entity(Position pos) {
         this.position = pos;
@@ -19,7 +21,7 @@ public class Entity {
 
     // Permet-on au joueur de traverser ?
     public boolean isCrossable(Player player) {
-        return true; // Par défaut, on peut tout traverser
+        return true;
     }
 
     // Qu'arrive-t-il si le joueur entre en contact ?
@@ -35,5 +37,9 @@ public class Entity {
     // Quel est le type de cette entité ?
     public EntityType getType() {
         return null; // P2 doit implémenter ça
+    }
+
+    public void consume() {
+         consumed = true;
     }
 }

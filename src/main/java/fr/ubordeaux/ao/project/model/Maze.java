@@ -26,9 +26,10 @@ public class Maze {
 
     private Position playerSpawn;
     private List<Position> enemySpawns;
-    private Position keyPosition;
-    private List<Position> doorPositions;  // ← CORRIGÉ : List<Position> au lieu de Position
+    private List<Position> keyPositions;
+    private List<Position> doorPositions;
     private Position exitPosition;
+
 
     /**
      * Constructeur du labyrinthe.
@@ -38,6 +39,7 @@ public class Maze {
     public Maze(String fileName) {
         this.enemySpawns = new ArrayList<>();
         this.doorPositions = new ArrayList<>();
+        this.keyPositions = new ArrayList<>();
         loadJson(fileName);
     }
 
@@ -84,7 +86,7 @@ public class Maze {
                         enemySpawns.add(new Position(x, y));
                         tiles[y][x] = '0';
                     } else if (c == 'K') {
-                        keyPosition = new Position(x, y);
+                        keyPositions.add(new Position(x, y));
                         tiles[y][x] = '0';
                     } else if (c == 'D') {
                         doorPositions.add(new Position(x, y));
@@ -188,8 +190,8 @@ public class Maze {
     /**
      * @return La position de la clé
      */
-    public Position getKeyPosition() {
-        return keyPosition;
+    public List<Position> getKeyPosition() {
+        return keyPositions;
     }
 
     /**
